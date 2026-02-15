@@ -352,7 +352,7 @@
                 },
                 {
                     "name": "Rot Y",
-                    "value": 90.0421875
+                    "value": 90
                 }
             ],
             "objName": "Ops.Graphics.OrbitControls_v3"
@@ -405,11 +405,11 @@
             "portsOut": [
                 {
                     "name": "x",
-                    "value": -0.8991877400768246
+                    "value": -0.9867357554417413
                 },
                 {
                     "name": "y",
-                    "value": -0.7634834155701754
+                    "value": -0.8848684210526316
                 },
                 {
                     "name": "click right",
@@ -432,11 +432,11 @@
                 },
                 {
                     "name": "Movement X",
-                    "value": -102
+                    "value": -3
                 },
                 {
                     "name": "Movement Y",
-                    "value": 0
+                    "value": 4
                 }
             ],
             "objName": "Ops.Devices.Mouse.Mouse_v4"
@@ -4530,14 +4530,7 @@
                 },
                 {
                     "name": "Finished Initial Loading",
-                    "links": [
-                        {
-                            "portIn": "boolean",
-                            "portOut": "Finished Initial Loading",
-                            "objIn": "pqwqsfr2v",
-                            "objOut": "n2thqe8tq"
-                        }
-                    ]
+                    "value": 1
                 },
                 {
                     "name": "Loading",
@@ -4578,6 +4571,12 @@
         {
             "id": "pqwqsfr2v",
             "uiAttribs": {},
+            "portsIn": [
+                {
+                    "name": "boolean",
+                    "value": 1
+                }
+            ],
             "portsOut": [
                 {
                     "name": "then",
@@ -4713,15 +4712,10 @@
             "portsIn": [
                 {
                     "name": "Format",
-                    "value": "Chargement $a %"
+                    "value": "Chargement $b : $a %"
                 },
                 {
-                    "name": "String B",
-                    "value": ""
-                },
-                {
-                    "name": "String C",
-                    "value": ""
+                    "name": "String C"
                 },
                 {
                     "name": "String D",
@@ -21390,7 +21384,7 @@
                 },
                 {
                     "name": "time",
-                    "value": 29.88
+                    "value": 0
                 }
             ],
             "objName": "Ops.TimeLine.TimeLineControls"
@@ -22039,7 +22033,7 @@
                 },
                 {
                     "name": "Duration MS",
-                    "value": 119
+                    "value": 124
                 }
             ],
             "objName": "Ops.Json.HttpRequest_v4"
@@ -22126,7 +22120,7 @@
                 },
                 {
                     "name": "Duration MS",
-                    "value": 119
+                    "value": 124
                 }
             ],
             "objName": "Ops.Json.HttpRequest_v4"
@@ -22213,7 +22207,7 @@
                 },
                 {
                     "name": "Duration MS",
-                    "value": 119
+                    "value": 124
                 }
             ],
             "objName": "Ops.Json.HttpRequest_v4"
@@ -22300,7 +22294,7 @@
                 },
                 {
                     "name": "Duration MS",
-                    "value": 119
+                    "value": 124
                 }
             ],
             "objName": "Ops.Json.HttpRequest_v4"
@@ -22387,7 +22381,7 @@
                 },
                 {
                     "name": "Duration MS",
-                    "value": 119
+                    "value": 124
                 }
             ],
             "objName": "Ops.Json.HttpRequest_v4"
@@ -22398,7 +22392,7 @@
             "portsIn": [
                 {
                     "name": "URL",
-                    "value": "https://github.com/60-hz/BrikabrakSim/raw/refs/heads/main/assets/Monatge_test6_narration_feminine_masculine.mp3",
+                    "value": "",
                     "display": "file"
                 },
                 {
@@ -22424,15 +22418,15 @@
                 },
                 {
                     "name": "Finished Loading",
-                    "value": 1
+                    "value": 0
                 },
                 {
                     "name": "Sample Rate",
-                    "value": 48000
+                    "value": 0
                 },
                 {
                     "name": "Length",
-                    "value": 3934322
+                    "value": 0
                 },
                 {
                     "name": "Duration",
@@ -22447,7 +22441,7 @@
                 },
                 {
                     "name": "Number of Channels",
-                    "value": 2
+                    "value": 0
                 },
                 {
                     "name": "isLoading",
@@ -22711,11 +22705,35 @@
                 }
             ],
             "objName": "Ops.Local.StringToArrayV3"
+        },
+        {
+            "id": "9agv8io85",
+            "uiAttribs": {},
+            "portsIn": [
+                {
+                    "name": "value",
+                    "value": "v8.1"
+                }
+            ],
+            "portsOut": [
+                {
+                    "name": "String",
+                    "links": [
+                        {
+                            "portIn": "String B",
+                            "portOut": "String",
+                            "objIn": "0aq68wkv1",
+                            "objOut": "9agv8io85"
+                        }
+                    ]
+                }
+            ],
+            "objName": "Ops.String.String_v3"
         }
     ],
     "export": {
-        "time": "2026-02-15 12:50",
+        "time": "2026-02-15 13:35",
         "service": "html",
-        "exportNumber": 23
+        "exportNumber": 26
     }
 }

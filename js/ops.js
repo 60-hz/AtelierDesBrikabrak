@@ -17677,6 +17677,80 @@ CABLES.OPS["4f6e23ab-f183-4d2e-afa4-5c8c6104a316"]={f:Ops.Local.StringToArrayV3,
 
 
 
+
+// **************************************************************
+// 
+// Ops.String.String_v3
+// 
+// **************************************************************
+
+Ops.String.String_v3= class extends CABLES.Op 
+{
+constructor()
+{
+super(...arguments);
+const op=this;
+const attachments=op.attachments={};
+const
+    v = op.inString("value", ""),
+    result = op.outString("String");
+v.setUiAttribs({ "display": "text" });
+
+let hasExtTitle = false;
+let lines = [];
+
+op.setUiAttrib({ "height": 100, "width": 250, "resizable": true, "vizLayerMaxZoom": 2500 });
+
+v.onChange = function ()
+{
+    op.setUiAttrib({ "extendTitle": "" });
+    if (CABLES.UI)
+    {
+        if (v.get()) lines = (v.get() || "").split("\n");
+        else lines = [];
+    }
+    result.set(v.get());
+};
+
+op.renderVizLayer = (ctx, layer, viz) =>
+{
+    if (layer.height < 10)
+    {
+        op.setUiAttrib({ "extendTitle": v.get() });
+        hasExtTitle = true;
+        return;
+    }
+
+    if (hasExtTitle) op.setUiAttrib({ "extendTitle": null });
+    hasExtTitle = false;
+
+    viz.clear(ctx, layer);
+
+    if (!v.get()) return;
+
+    ctx.save();
+    ctx.scale(layer.scale, layer.scale);
+
+    viz.renderText(ctx, layer, lines, {
+        "zoomText": false,
+        "showLineNum": false,
+        "fontSize": 12,
+        "scroll": 0,
+        "syntax": "text",
+        "showWhitespace": false,
+        "wrap": true
+    });
+
+    ctx.restore();
+};
+
+}
+};
+
+CABLES.OPS["eff161f2-6fe2-43a5-a884-af7e7a19a523"]={f:Ops.String.String_v3,objName:"Ops.String.String_v3"};
+
+
+
 window.addEventListener('load', function(event) {
 CABLES.jsLoaded=new Event('CABLES.jsLoaded');
 document.dispatchEvent(CABLES.jsLoaded);
