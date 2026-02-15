@@ -405,11 +405,11 @@
             "portsOut": [
                 {
                     "name": "x",
-                    "value": -0.9867357554417413
+                    "value": 0.8713488316261204
                 },
                 {
                     "name": "y",
-                    "value": -0.8848684210526316
+                    "value": 0.5965083607456141
                 },
                 {
                     "name": "click right",
@@ -432,11 +432,11 @@
                 },
                 {
                     "name": "Movement X",
-                    "value": -3
+                    "value": 0
                 },
                 {
                     "name": "Movement Y",
-                    "value": 4
+                    "value": 0
                 }
             ],
             "objName": "Ops.Devices.Mouse.Mouse_v4"
@@ -4673,7 +4673,7 @@
                 },
                 {
                     "name": "Width",
-                    "value": 3.077218191964286
+                    "value": 4.049944196428571
                 },
                 {
                     "name": "Font Available",
@@ -22392,7 +22392,7 @@
             "portsIn": [
                 {
                     "name": "URL",
-                    "value": "",
+                    "value": "assets/assets_Montage_test6_narration_feminine_masculine.mp3",
                     "display": "file"
                 },
                 {
@@ -22418,15 +22418,15 @@
                 },
                 {
                     "name": "Finished Loading",
-                    "value": 0
+                    "value": 1
                 },
                 {
                     "name": "Sample Rate",
-                    "value": 0
+                    "value": 48000
                 },
                 {
                     "name": "Length",
-                    "value": 0
+                    "value": 3934322
                 },
                 {
                     "name": "Duration",
@@ -22441,7 +22441,7 @@
                 },
                 {
                     "name": "Number of Channels",
-                    "value": 0
+                    "value": 2
                 },
                 {
                     "name": "isLoading",
@@ -22732,8 +22732,8 @@
         }
     ],
     "export": {
-        "time": "2026-02-15 13:35",
+        "time": "2026-02-15 14:54",
         "service": "html",
-        "exportNumber": 26
+        "exportNumber": 27
     }
 }
