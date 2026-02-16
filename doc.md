@@ -6,6 +6,7 @@
 * __GlobalIntensity__ ```Number```
 * __GlobalR__ ```Number```
 * __labels__ ```Number```
+* __loaded__ ```Number```
 * __MachinePosX__ ```Number```
 * __MachinePosY__ ```Number```
 * __MachinePosZ__ ```Number```

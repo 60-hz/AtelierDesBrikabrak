@@ -44,11 +44,11 @@
                 },
                 {
                     "name": "width",
-                    "value": 781
+                    "value": 1578
                 },
                 {
                     "name": "height",
-                    "value": 456
+                    "value": 629
                 },
                 {
                     "name": "Pixel Density",
@@ -405,11 +405,11 @@
             "portsOut": [
                 {
                     "name": "x",
-                    "value": 0.8713488316261204
+                    "value": -0.5324184093789608
                 },
                 {
                     "name": "y",
-                    "value": 0.5965083607456141
+                    "value": -0.7405355723370429
                 },
                 {
                     "name": "click right",
@@ -432,11 +432,11 @@
                 },
                 {
                     "name": "Movement X",
-                    "value": 0
+                    "value": 537
                 },
                 {
                     "name": "Movement Y",
-                    "value": 0
+                    "value": 134
                 }
             ],
             "objName": "Ops.Devices.Mouse.Mouse_v4"
@@ -4427,7 +4427,7 @@
                 },
                 {
                     "name": "Default",
-                    "value": "#e1c7b8"
+                    "value": "#f7d9c8"
                 },
                 {
                     "name": "Show Opacity",
@@ -4530,7 +4530,20 @@
                 },
                 {
                     "name": "Finished Initial Loading",
-                    "value": 1
+                    "links": [
+                        {
+                            "portIn": "boolean",
+                            "portOut": "Finished Initial Loading",
+                            "objIn": "pqwqsfr2v",
+                            "objOut": "n2thqe8tq"
+                        },
+                        {
+                            "portIn": "Value",
+                            "portOut": "Finished Initial Loading",
+                            "objIn": "wxgv3dadp",
+                            "objOut": "n2thqe8tq"
+                        }
+                    ]
                 },
                 {
                     "name": "Loading",
@@ -4571,12 +4584,6 @@
         {
             "id": "pqwqsfr2v",
             "uiAttribs": {},
-            "portsIn": [
-                {
-                    "name": "boolean",
-                    "value": 1
-                }
-            ],
             "portsOut": [
                 {
                     "name": "then",
@@ -4627,7 +4634,7 @@
                 },
                 {
                     "name": "Line Height",
-                    "value": 0.5
+                    "value": 1
                 },
                 {
                     "name": "Letter Spacing",
@@ -4669,11 +4676,11 @@
             "portsOut": [
                 {
                     "name": "Total Lines",
-                    "value": 1
+                    "value": 2
                 },
                 {
                     "name": "Width",
-                    "value": 4.049944196428571
+                    "value": 2.977469308035714
                 },
                 {
                     "name": "Font Available",
@@ -4712,10 +4719,11 @@
             "portsIn": [
                 {
                     "name": "Format",
-                    "value": "Chargement $b : $a %"
+                    "value": "Chargement $b $a %"
                 },
                 {
-                    "name": "String C"
+                    "name": "String C",
+                    "value": 2
                 },
                 {
                     "name": "String D",
@@ -9422,7 +9430,7 @@
                 },
                 {
                     "name": "Input Green",
-                    "value": 0.8666666666666667
+                    "value": 0.9372549019607843
                 },
                 {
                     "name": "Input Blue",
@@ -9492,7 +9500,7 @@
                 },
                 {
                     "name": "Hex",
-                    "value": "#ffddd0"
+                    "value": "#ffefd0"
                 }
             ],
             "objName": "Ops.Sidebar.ColorPicker_v3"
@@ -9957,7 +9965,7 @@
             "portsIn": [
                 {
                     "name": "Default",
-                    "value": 0
+                    "value": 1
                 }
             ],
             "portsOut": [
@@ -14521,7 +14529,7 @@
                 },
                 {
                     "name": "length",
-                    "value": 16392
+                    "value": 17020
                 }
             ],
             "objName": "Ops.Local.StringToArray3"
@@ -21584,9 +21592,9 @@
                     "name": "Value",
                     "links": [
                         {
-                            "portIn": "Visible",
+                            "portIn": "bool 1",
                             "portOut": "Value",
-                            "objIn": "n3gvdlzgz",
+                            "objIn": "xsh8vswg1",
                             "objOut": "8t65a0xbz"
                         }
                     ]
@@ -21597,24 +21605,6 @@
         {
             "id": "epep5zebp",
             "uiAttribs": {},
-            "portsIn": [
-                {
-                    "name": "InR",
-                    "value": 0
-                },
-                {
-                    "name": "InG",
-                    "value": 0
-                },
-                {
-                    "name": "InB",
-                    "value": 0
-                },
-                {
-                    "name": "InW",
-                    "value": 0
-                }
-            ],
             "portsOut": [
                 {
                     "name": "OutR",
@@ -22033,7 +22023,7 @@
                 },
                 {
                     "name": "Duration MS",
-                    "value": 124
+                    "value": 1274
                 }
             ],
             "objName": "Ops.Json.HttpRequest_v4"
@@ -22120,7 +22110,7 @@
                 },
                 {
                     "name": "Duration MS",
-                    "value": 124
+                    "value": 1271
                 }
             ],
             "objName": "Ops.Json.HttpRequest_v4"
@@ -22207,7 +22197,7 @@
                 },
                 {
                     "name": "Duration MS",
-                    "value": 124
+                    "value": 1275
                 }
             ],
             "objName": "Ops.Json.HttpRequest_v4"
@@ -22294,7 +22284,7 @@
                 },
                 {
                     "name": "Duration MS",
-                    "value": 124
+                    "value": 1274
                 }
             ],
             "objName": "Ops.Json.HttpRequest_v4"
@@ -22381,7 +22371,7 @@
                 },
                 {
                     "name": "Duration MS",
-                    "value": 124
+                    "value": 1274
                 }
             ],
             "objName": "Ops.Json.HttpRequest_v4"
@@ -22392,7 +22382,7 @@
             "portsIn": [
                 {
                     "name": "URL",
-                    "value": "assets/assets_Montage_test6_narration_feminine_masculine.mp3",
+                    "value": "assets/Montage_test8_narration_feminine_masculine.mp3",
                     "display": "file"
                 },
                 {
@@ -22426,7 +22416,7 @@
                 },
                 {
                     "name": "Length",
-                    "value": 3934322
+                    "value": 4084548
                 },
                 {
                     "name": "Duration",
@@ -22509,7 +22499,7 @@
                 },
                 {
                     "name": "length",
-                    "value": 4098
+                    "value": 4225
                 }
             ],
             "objName": "Ops.Local.StringToArrayV3"
@@ -22573,7 +22563,7 @@
                 },
                 {
                     "name": "length",
-                    "value": 4098
+                    "value": 4225
                 }
             ],
             "objName": "Ops.Local.StringToArrayV3"
@@ -22637,7 +22627,7 @@
                 },
                 {
                     "name": "length",
-                    "value": 4098
+                    "value": 4255
                 }
             ],
             "objName": "Ops.Local.StringToArrayV3"
@@ -22701,7 +22691,7 @@
                 },
                 {
                     "name": "length",
-                    "value": 4098
+                    "value": 4225
                 }
             ],
             "objName": "Ops.Local.StringToArrayV3"
@@ -22712,7 +22702,7 @@
             "portsIn": [
                 {
                     "name": "value",
-                    "value": "v8.1"
+                    "value": "(v8.1)"
                 }
             ],
             "portsOut": [
@@ -22720,20 +22710,416 @@
                     "name": "String",
                     "links": [
                         {
-                            "portIn": "String B",
+                            "portIn": "String",
                             "portOut": "String",
-                            "objIn": "0aq68wkv1",
+                            "objIn": "o7kt9sma5",
                             "objOut": "9agv8io85"
                         }
                     ]
                 }
             ],
             "objName": "Ops.String.String_v3"
+        },
+        {
+            "id": "n3aba06ay",
+            "uiAttribs": {},
+            "portsIn": [
+                {
+                    "name": "Count Overlay",
+                    "value": 1
+                }
+            ],
+            "portsOut": [
+                {
+                    "name": "Count",
+                    "value": 5563
+                }
+            ],
+            "objName": "Ops.Ui.VizTrigger"
+        },
+        {
+            "id": "oqjh0zkah",
+            "uiAttribs": {},
+            "portsIn": [
+                {
+                    "name": "Port",
+                    "value": 9000
+                }
+            ],
+            "portsOut": [
+                {
+                    "name": "Message Received",
+                    "links": [
+                        {
+                            "portIn": "Trigger",
+                            "portOut": "Message Received",
+                            "objIn": "n3aba06ay",
+                            "objOut": "oqjh0zkah"
+                        }
+                    ]
+                },
+                {
+                    "name": "Message",
+                    "links": [
+                        {
+                            "portIn": "Message in",
+                            "portOut": "Message",
+                            "objIn": "k11i3zepg",
+                            "objOut": "oqjh0zkah"
+                        },
+                        {
+                            "portIn": "Message in",
+                            "portOut": "Message",
+                            "objIn": "nu5fx64kv",
+                            "objOut": "oqjh0zkah"
+                        },
+                        {
+                            "portIn": "Message in",
+                            "portOut": "Message",
+                            "objIn": "d5ry053xl",
+                            "objOut": "oqjh0zkah"
+                        },
+                        {
+                            "portIn": "Message in",
+                            "portOut": "Message",
+                            "objIn": "srmn377gy",
+                            "objOut": "oqjh0zkah"
+                        },
+                        {
+                            "portIn": "Message in",
+                            "portOut": "Message",
+                            "objIn": "h3ejj9io3",
+                            "objOut": "oqjh0zkah"
+                        }
+                    ]
+                },
+                {
+                    "name": "Status",
+                    "value": "ready"
+                }
+            ],
+            "objName": "Ops.Extension.Standalone.Net.Osc_v2"
+        },
+        {
+            "id": "p0r175h1v",
+            "uiAttribs": {},
+            "portsIn": [
+                {
+                    "name": "Variable",
+                    "value": "Spot3-Intensity"
+                }
+            ],
+            "objName": "Ops.Vars.VarSetNumber_v2"
+        },
+        {
+            "id": "j53yt4qac",
+            "uiAttribs": {},
+            "portsIn": [
+                {
+                    "name": "Variable",
+                    "value": "Spot4-Intensity"
+                }
+            ],
+            "objName": "Ops.Vars.VarSetNumber_v2"
+        },
+        {
+            "id": "k11i3zepg",
+            "uiAttribs": {},
+            "portsIn": [
+                {
+                    "name": "Osc Address",
+                    "value": "/spot4"
+                }
+            ],
+            "portsOut": [
+                {
+                    "name": "Number 0",
+                    "links": [
+                        {
+                            "portIn": "Value",
+                            "portOut": "Number 0",
+                            "objIn": "p0r175h1v",
+                            "objOut": "k11i3zepg"
+                        }
+                    ]
+                },
+                {
+                    "name": "Number 1",
+                    "value": 0
+                },
+                {
+                    "name": "Number 2",
+                    "value": 0
+                },
+                {
+                    "name": "Number 3",
+                    "value": 0
+                }
+            ],
+            "objName": "Ops.Extension.Osc2Ws.Osc2WsNumbers"
+        },
+        {
+            "id": "nu5fx64kv",
+            "uiAttribs": {},
+            "portsIn": [
+                {
+                    "name": "Osc Address",
+                    "value": "/spot3"
+                }
+            ],
+            "portsOut": [
+                {
+                    "name": "Number 0",
+                    "links": [
+                        {
+                            "portIn": "Value",
+                            "portOut": "Number 0",
+                            "objIn": "j53yt4qac",
+                            "objOut": "nu5fx64kv"
+                        }
+                    ]
+                },
+                {
+                    "name": "Number 1",
+                    "value": 0
+                },
+                {
+                    "name": "Number 2",
+                    "value": 0
+                },
+                {
+                    "name": "Number 3",
+                    "value": 0
+                }
+            ],
+            "objName": "Ops.Extension.Osc2Ws.Osc2WsNumbers"
+        },
+        {
+            "id": "xr9qrii8j",
+            "uiAttribs": {},
+            "portsIn": [
+                {
+                    "name": "Variable",
+                    "value": "Spot2-Intensity"
+                }
+            ],
+            "objName": "Ops.Vars.VarSetNumber_v2"
+        },
+        {
+            "id": "ympcohopi",
+            "uiAttribs": {},
+            "portsIn": [
+                {
+                    "name": "Variable",
+                    "value": "Spot1-Intensity"
+                }
+            ],
+            "objName": "Ops.Vars.VarSetNumber_v2"
+        },
+        {
+            "id": "d5ry053xl",
+            "uiAttribs": {},
+            "portsIn": [
+                {
+                    "name": "Osc Address",
+                    "value": "/global"
+                }
+            ],
+            "portsOut": [
+                {
+                    "name": "Number 0",
+                    "links": [
+                        {
+                            "portIn": "InR",
+                            "portOut": "Number 0",
+                            "objIn": "epep5zebp",
+                            "objOut": "d5ry053xl"
+                        }
+                    ]
+                },
+                {
+                    "name": "Number 1",
+                    "links": [
+                        {
+                            "portIn": "InG",
+                            "portOut": "Number 1",
+                            "objIn": "epep5zebp",
+                            "objOut": "d5ry053xl"
+                        }
+                    ]
+                },
+                {
+                    "name": "Number 2",
+                    "links": [
+                        {
+                            "portIn": "InB",
+                            "portOut": "Number 2",
+                            "objIn": "epep5zebp",
+                            "objOut": "d5ry053xl"
+                        }
+                    ]
+                },
+                {
+                    "name": "Number 3",
+                    "links": [
+                        {
+                            "portIn": "InW",
+                            "portOut": "Number 3",
+                            "objIn": "epep5zebp",
+                            "objOut": "d5ry053xl"
+                        }
+                    ]
+                }
+            ],
+            "objName": "Ops.Extension.Osc2Ws.Osc2WsNumbers"
+        },
+        {
+            "id": "srmn377gy",
+            "uiAttribs": {},
+            "portsIn": [
+                {
+                    "name": "Osc Address",
+                    "value": "/spot2"
+                }
+            ],
+            "portsOut": [
+                {
+                    "name": "Number 0",
+                    "links": [
+                        {
+                            "portIn": "Value",
+                            "portOut": "Number 0",
+                            "objIn": "xr9qrii8j",
+                            "objOut": "srmn377gy"
+                        }
+                    ]
+                },
+                {
+                    "name": "Number 1",
+                    "value": 0
+                },
+                {
+                    "name": "Number 2",
+                    "value": 0
+                },
+                {
+                    "name": "Number 3",
+                    "value": 0
+                }
+            ],
+            "objName": "Ops.Extension.Osc2Ws.Osc2WsNumbers"
+        },
+        {
+            "id": "h3ejj9io3",
+            "uiAttribs": {},
+            "portsIn": [
+                {
+                    "name": "Osc Address",
+                    "value": "/spot1"
+                }
+            ],
+            "portsOut": [
+                {
+                    "name": "Number 0",
+                    "links": [
+                        {
+                            "portIn": "Value",
+                            "portOut": "Number 0",
+                            "objIn": "ympcohopi",
+                            "objOut": "h3ejj9io3"
+                        }
+                    ]
+                },
+                {
+                    "name": "Number 1",
+                    "value": 0
+                },
+                {
+                    "name": "Number 2",
+                    "value": 0
+                },
+                {
+                    "name": "Number 3",
+                    "value": 0
+                }
+            ],
+            "objName": "Ops.Extension.Osc2Ws.Osc2WsNumbers"
+        },
+        {
+            "id": "o7kt9sma5",
+            "uiAttribs": {},
+            "portsOut": [
+                {
+                    "name": "Result",
+                    "links": [
+                        {
+                            "portIn": "String B",
+                            "portOut": "Result",
+                            "objIn": "0aq68wkv1",
+                            "objOut": "o7kt9sma5"
+                        }
+                    ]
+                }
+            ],
+            "objName": "Ops.String.LineBreak"
+        },
+        {
+            "id": "wxgv3dadp",
+            "uiAttribs": {},
+            "portsIn": [
+                {
+                    "name": "Variable",
+                    "value": "loaded"
+                }
+            ],
+            "objName": "Ops.Vars.VarSetNumber_v2"
+        },
+        {
+            "id": "xsh8vswg1",
+            "uiAttribs": {},
+            "portsOut": [
+                {
+                    "name": "result",
+                    "links": [
+                        {
+                            "portIn": "Visible",
+                            "portOut": "result",
+                            "objIn": "n3gvdlzgz",
+                            "objOut": "xsh8vswg1"
+                        }
+                    ]
+                }
+            ],
+            "objName": "Ops.Boolean.And"
+        },
+        {
+            "id": "5d8nqa0mt",
+            "uiAttribs": {},
+            "portsIn": [
+                {
+                    "name": "Variable",
+                    "value": "loaded"
+                }
+            ],
+            "portsOut": [
+                {
+                    "name": "Value",
+                    "links": [
+                        {
+                            "portIn": "bool 2",
+                            "portOut": "Value",
+                            "objIn": "xsh8vswg1",
+                            "objOut": "5d8nqa0mt"
+                        }
+                    ]
+                }
+            ],
+            "objName": "Ops.Vars.VarGetNumber_v2"
         }
     ],
     "export": {
-        "time": "2026-02-15 14:54",
+        "time": "2026-02-16 10:55",
         "service": "html",
-        "exportNumber": 27
+        "exportNumber": 30
     }
 }

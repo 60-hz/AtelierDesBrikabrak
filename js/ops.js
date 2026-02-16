@@ -25,6 +25,7 @@ Ops.Gl.Phong=Ops.Gl.Phong || {};
 Ops.Graphics=Ops.Graphics || {};
 Ops.TimeLine=Ops.TimeLine || {};
 Ops.WebAudio=Ops.WebAudio || {};
+Ops.Extension=Ops.Extension || {};
 Ops.Gl.Matrix=Ops.Gl.Matrix || {};
 Ops.Gl.Meshes=Ops.Gl.Meshes || {};
 Ops.Gl.Shader=Ops.Gl.Shader || {};
@@ -35,8 +36,11 @@ Ops.TimeLine.Viz=Ops.TimeLine.Viz || {};
 Ops.Devices.Mouse=Ops.Devices.Mouse || {};
 Ops.Graphics.Meshes=Ops.Graphics.Meshes || {};
 Ops.Devices.Keyboard=Ops.Devices.Keyboard || {};
+Ops.Extension.Osc2Ws=Ops.Extension.Osc2Ws || {};
 Ops.Gl.ShaderEffects=Ops.Gl.ShaderEffects || {};
 Ops.Graphics.Geometry=Ops.Graphics.Geometry || {};
+Ops.Extension.Standalone=Ops.Extension.Standalone || {};
+Ops.Extension.Standalone.Net=Ops.Extension.Standalone.Net || {};
 
 
 
@@ -17748,6 +17752,324 @@ op.renderVizLayer = (ctx, layer, viz) =>
 };
 
 CABLES.OPS["eff161f2-6fe2-43a5-a884-af7e7a19a523"]={f:Ops.String.String_v3,objName:"Ops.String.String_v3"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Ui.VizTrigger
+// 
+// **************************************************************
+
+Ops.Ui.VizTrigger= class extends CABLES.Op 
+{
+constructor()
+{
+super(...arguments);
+const op=this;
+const attachments=op.attachments={};
+const
+    inTrigger = op.inTriggerButton("Trigger"),
+    inReset = op.inTriggerButton("Reset"),
+    inText = op.inBool("Count Overlay", true),
+    outCount = op.outNumber("Count"),
+    next = op.outTrigger("Next");
+
+op.setUiAttrib({ "height": 100, "width": 130, "resizable": true });
+
+let lastTime = 0;
+let count = 0;
+let lh = 0;
+
+inReset.onTriggered = () =>
+{
+    count = 0;
+    if (!inText.get()) op.setUiAttrib({ "extendTitle": "_____" + String(count) });
+    outCount.set(count);
+};
+
+inTrigger.onTriggered = () =>
+{
+    lastTime = performance.now();
+    count++;
+    if (!inText.get()) op.setUiAttrib({ "extendTitle": String(count) });
+    outCount.set(count);
+
+    next.trigger();
+};
+
+inText.onChange = () =>
+{
+    op.setUiAttrib({ "extendTitle": null });
+};
+
+op.renderVizLayer = (ctx, layer) =>
+{
+    ctx.fillStyle = "#222";
+    ctx.fillRect(
+        layer.x, layer.y,
+        layer.width, layer.height);
+
+    let radius = Math.min(layer.height, layer.width) / 2.4 * 0.8;
+    let diff = performance.now() - lastTime;
+
+    let v = CABLES.map(diff, 0, 100, 1, 0);
+
+    ctx.globalAlpha = v + 0.3;
+    ctx.fillStyle = "#ccc";
+
+    let circle = new Path2D();
+
+    const sizeAnim = v * 6;
+    circle.arc(
+        layer.x + layer.width / 2,
+        layer.y + layer.height / 2,
+        Math.abs(radius - (ctx.lineWidth / 2) + (sizeAnim * 2)),
+        0, 2 * Math.PI, false);
+    ctx.fill(circle);
+
+    ctx.globalAlpha = 1;
+
+    if (inText.get())
+    {
+        const fntSize = Math.min(layer.height, layer.width) / 4;
+        ctx.font = fntSize + "px monospace";
+        const textDimensions = ctx.measureText(String(count));
+
+        ctx.fillStyle = "#000";
+        ctx.fillText(String(count), layer.x + layer.width / 2 - textDimensions.width / 2, layer.y + layer.height / 2 + fntSize / 3);
+    }
+};
+
+}
+};
+
+CABLES.OPS["4533060f-3cd4-4572-ac78-dad0710a3f7a"]={f:Ops.Ui.VizTrigger,objName:"Ops.Ui.VizTrigger"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Extension.Standalone.Net.Osc_v2
+// 
+// **************************************************************
+
+Ops.Extension.Standalone.Net.Osc_v2= class extends CABLES.Op 
+{
+constructor()
+{
+super(...arguments);
+const op=this;
+const attachments=op.attachments={};
+
+const
+    inPort = op.inInt("Port",9000),
+    next = op.outTrigger("Message Received"),
+    msg=op.outObject("Message"),
+    outConn=op.outObject("Connection"),
+    outStatus=op.outString("Status");
+
+const osc=op.require("osc");
+let udpPort=null;
+inPort.onChange=start;
+op.onDelete=stop;
+start();
+
+function start()
+{
+    outStatus.set("");
+    if(udpPort)stop();
+    outStatus.set("connecting");
+
+    try
+    {
+        udpPort = new osc.UDPPort({
+            localAddress: "0.0.0.0",
+            localPort: inPort.get(),
+            metadata: true
+        });
+
+        udpPort.open();
+
+        udpPort.on("error", function (e)
+        {
+            outStatus.set(e.message);
+        });
+
+        udpPort.on("message", function (m)
+        {
+            if (m.address) {
+                m = {
+                    a: m.address,
+                    v: m.args.map(( arg ) => arg.value)
+                };
+            }
+            msg.setRef(m);
+            next.trigger();
+        });
+
+        udpPort.on("ready", function () {
+            outStatus.set("ready");
+            outConn.set(udpPort);
+        });
+
+    }
+    catch(e)
+    {
+        outStatus.set(e.message);
+    }
+}
+
+function stop()
+{
+    if(udpPort)udpPort.close();
+    udpPort=null;
+    outConn.set(null);
+}
+
+}
+};
+
+CABLES.OPS["18a2f804-20ad-4cb9-87b9-b097ad23f518"]={f:Ops.Extension.Standalone.Net.Osc_v2,objName:"Ops.Extension.Standalone.Net.Osc_v2"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Extension.Osc2Ws.Osc2WsNumbers
+// 
+// **************************************************************
+
+Ops.Extension.Osc2Ws.Osc2WsNumbers= class extends CABLES.Op 
+{
+constructor()
+{
+super(...arguments);
+const op=this;
+const attachments=op.attachments={};
+const
+    inMessage = op.inObject("Message in"),
+    inAddress = op.inString("Osc Address"),
+    learn = op.inTriggerButton("Learn"),
+    outMsg = op.outObject("Message through"),
+    outTrig = op.outTrigger("Received");
+
+let learning = false;
+learn.onTriggered = function () { learning = true; };
+
+let numberPorts = [];
+for (let i = 0; i < 4; i++)
+{
+    numberPorts[i] = op.outNumber("Number " + i);
+}
+
+inMessage.onChange = function ()
+{
+    const msg = inMessage.get();
+
+    if (learning)
+    {
+        if (msg && msg.a)
+        {
+            inAddress.set(msg.a);
+            learning = false;
+            op.refreshParams();
+            return;
+        }
+        return;
+    }
+
+    if (!msg || !msg.a || msg.a != inAddress.get())
+    {
+        return;
+    }
+    else
+    {
+        for (var i = 0; i < 3; i++)
+        {
+            numberPorts[i].set(0);
+        }
+        for (var i = 0; i < msg.v.length; i++)
+        {
+            numberPorts[i].set(0);
+            numberPorts[i].set(msg.v[i]);
+        }
+        outTrig.trigger();
+    }
+    outMsg.set(msg);
+};
+
+}
+};
+
+CABLES.OPS["252f4360-6994-4081-b6c4-e573c68c40c5"]={f:Ops.Extension.Osc2Ws.Osc2WsNumbers,objName:"Ops.Extension.Osc2Ws.Osc2WsNumbers"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.String.LineBreak
+// 
+// **************************************************************
+
+Ops.String.LineBreak= class extends CABLES.Op 
+{
+constructor()
+{
+super(...arguments);
+const op=this;
+const attachments=op.attachments={};
+const
+    inStr = op.inString("String"),
+    outStr = op.outString("Result", "\n");
+
+inStr.onChange = () =>
+{
+    outStr.set(inStr.get() + "\n");
+};
+
+}
+};
+
+CABLES.OPS["3f87d5bf-bf38-4674-8445-c92191b892cb"]={f:Ops.String.LineBreak,objName:"Ops.String.LineBreak"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Boolean.And
+// 
+// **************************************************************
+
+Ops.Boolean.And= class extends CABLES.Op 
+{
+constructor()
+{
+super(...arguments);
+const op=this;
+const attachments=op.attachments={};
+const
+    bool0 = op.inValueBool("bool 1"),
+    bool1 = op.inValueBool("bool 2"),
+    result = op.outBoolNum("result");
+
+bool0.onChange =
+bool1.onChange = exec;
+
+function exec()
+{
+    result.set(bool1.get() && bool0.get());
+}
+
+}
+};
+
+CABLES.OPS["c26e6ce0-8047-44bb-9bc8-5a4f911ed8ad"]={f:Ops.Boolean.And,objName:"Ops.Boolean.And"};
 
 
 
