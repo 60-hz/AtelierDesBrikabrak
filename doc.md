@@ -1,6 +1,10 @@
 ## Patch Variables:
 
 * __currentTime__ ```Number```
+* __Fog-amount__ ```Number``` (default Value: `0.1`)
+* __Fog-B__ ```Number``` (default Value: `0.4`)
+* __Fog-G__ ```Number``` (default Value: `0.3`)
+* __Fog-R__ ```Number``` (default Value: `0.55`)
 * __GlobalB__ ```Number```
 * __GlobalG__ ```Number```
 * __GlobalIntensity__ ```Number```
@@ -22,6 +26,7 @@
 * __PalDimension__ ```Number```
 * __playAudio__ ```Number``` (default Value: `1`)
 * __shadow__ ```Number```
+* __ShadowStrength__ ```Number``` (default Value: `0.02`)
 * __songLength__ ```Number```
 * __Spot1-AngleX__ ```Number```
 * __Spot1-AngleZ__ ```Number```
@@ -38,7 +43,6 @@
 * __Spot2B__ ```Number```
 * __Spot2G__ ```Number```
 * __Spot2R__ ```Number```
-* __Spot2X__ ```Number``` (default Value: `0`)
 * __Spot3-AngleX__ ```Number```
 * __Spot3-AngleZ__ ```Number```
 * __Spot3-Intensity__ ```Number```
@@ -46,7 +50,6 @@
 * __Spot3B__ ```Number```
 * __Spot3G__ ```Number```
 * __Spot3R__ ```Number```
-* __Spot3X__ ```Number``` (default Value: `0`)
 * __Spot4-AngleX__ ```Number```
 * __Spot4-AngleZ__ ```Number```
 * __Spot4-Intensity__ ```Number```
@@ -54,6 +57,5 @@
 * __Spot4B__ ```Number```
 * __Spot4G__ ```Number```
 * __Spot4R__ ```Number```
-* __Spot4X__ ```Number``` (default Value: `0`)
 * __spotselect__ ```Number```
 

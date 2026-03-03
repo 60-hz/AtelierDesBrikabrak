@@ -152,8 +152,9 @@ class Helper
      */
     isNumeric(n)
     {
-        const nn = parseFloat(n);
-        return !isNaN(nn) && isFinite(nn);
+        // const nn = parseFloat(n);
+        // return !isNaN(nn) && isFinite(nn);
+        return !isNaN(parseFloat(n)) && isFinite(n);
     }
 
     /**
@@ -256,7 +257,7 @@ class Logger
 
     warn()
     {
-        if ((CABLES.UI && CABLES.UI.logFilter.filterLog({ "initiator": this.initiator, "level": 1 }, ...arguments)) || !CABLES.logSilent)
+        if ((CABLES.UI && CABLES.UI.logFilter.filterLog({ "initiator": this.initiator, "level": 1 }, ...arguments)))
             console.warn("[" + this.initiator + "]", ...arguments);
     }
 
@@ -545,8 +546,8 @@ class AnimKey
     }
 
     /**
-     * @param {Anim} a
      * @param {any} clipId
+     * @param {Anim} a
      */
     setClip(clipId, a)
     {
@@ -606,6 +607,8 @@ class AnimKey
         else if (this._easing == Anim.EASING_ABSOLUTE) this.ease = this.easeAbsolute;
         else if (this._easing == Anim.EASING_SMOOTHSTEP) this.ease = AnimKey.easeSmoothStep;
         else if (this._easing == Anim.EASING_SMOOTHERSTEP) this.ease = AnimKey.easeSmootherStep;
+
+        /* minimalcore:start */
         else if (this._easing == Anim.EASING_CUBIC_IN) this.ease = AnimKey.easeCubicIn;
         else if (this._easing == Anim.EASING_CUBIC_OUT) this.ease = AnimKey.easeCubicOut;
         else if (this._easing == Anim.EASING_CUBIC_INOUT) this.ease = AnimKey.easeCubicInOut;
@@ -629,6 +632,8 @@ class AnimKey
         else if (this._easing == Anim.EASING_QUINT_OUT) this.ease = AnimKey.easeOutQuint;
         else if (this._easing == Anim.EASING_QUINT_IN) this.ease = AnimKey.easeInQuint;
         else if (this._easing == Anim.EASING_QUINT_INOUT) this.ease = AnimKey.easeInOutQuint;
+
+        /* minimalcore:end */
         else if (this._easing == Anim.EASING_CLIP) this.ease = this.easeAbsolute;
         else if (this._easing == Anim.EASING_CUBICSPLINE)
         {
@@ -827,6 +832,7 @@ AnimKey.linear = function (perc, key1, key2)
     return (key1.value) + (key2.value - key1.value) * perc;
 };
 
+/* minimalcore:start */
 const easeExpoIn = function (t)
 {
     return (t = 2 ** (10 * (t - 1)));
@@ -1075,6 +1081,7 @@ AnimKey.easeCubicInOut = function (t, key2)
     return AnimKey.linear(t, this, key2);
 };
 
+/* minimalcore:end */
 AnimKey.easeSmoothStep = function (perc, key2)
 {
     // var x = Math.max(0, Math.min(1, (perc-0)/(1-0)));
@@ -1127,6 +1134,8 @@ class Anim extends Events
     static EASING_ABSOLUTE = 1;
     static EASING_SMOOTHSTEP = 2;
     static EASING_SMOOTHERSTEP = 3;
+
+    /* minimalcore:start */
     static EASING_CUBICSPLINE = 4;
 
     static EASING_CUBIC_IN = 5;
@@ -1159,6 +1168,8 @@ class Anim extends Events
     static EASING_QUINT_OUT = 26;
     static EASING_QUINT_INOUT = 27;
 
+    /* minimalcore:end */
+
     static EASING_CLIP = 28;
 
     static EASINGNAMES = ["linear", "absolute", "smoothstep", "smootherstep", "Cubic In", "Cubic Out", "Cubic In Out", "Expo In", "Expo Out", "Expo In Out", "Sin In", "Sin Out", "Sin In Out", "Quart In", "Quart Out", "Quart In Out", "Quint In", "Quint Out", "Quint In Out", "Back In", "Back Out", "Back In Out", "Elastic In", "Elastic Out", "Bounce In", "Bounce Out", "Clip"];
@@ -1179,6 +1190,7 @@ class Anim extends Events
     onChange = null;
     stayInTimeline = false;
     batchMode = false;
+    #log = new Logger("Anim");
 
     /**
      * @param {AnimCfg} [cfg]
@@ -1188,7 +1200,6 @@ class Anim extends Events
         super();
         cfg = cfg || {};
         this.id = uuid();
-        this._log = new Logger("Anim");
         this.name = cfg.name || null;
 
         /** @type {Number} */
@@ -1235,9 +1246,6 @@ class Anim extends Events
      * checks if last key time is < time
      * @param {Number} time
      * @returns {Boolean}
-     * @memberof Anim
-     * @instance
-     * @function
      */
     hasEnded(time)
     {
@@ -1273,9 +1281,6 @@ class Anim extends Events
     /**
      * remove all keys from animation before time
      * @param {Number} time
-     * @memberof Anim
-     * @instance
-     * @function
      */
     clearBefore(time)
     {
@@ -1335,7 +1340,6 @@ class Anim extends Events
         {
             this.keys.sort((a, b) => { return a.time - b.time; });
             this.#needsSort = false;
-            if (this.keys.length > 999 && this.keys.length % 1000 == 0)console.log(this.name, this.keys.length);
 
             this.emitEvent(Anim.EVENT_CHANGE);
         }
@@ -1427,7 +1431,7 @@ class Anim extends Events
      */
     setValue(time, value, cb = null)
     {
-        if (isNaN(value))CABLES.logStack();
+        if (CABLES.UI && CABLES.UI.showDevInfos) if (isNaN(value)) CABLES.logStack();
 
         if (this.#needsSort) this.sortKeys();
         let found = null;
@@ -1455,7 +1459,6 @@ class Anim extends Events
                 });
             this.keys.push(found);
 
-            // if (this.keys.length % 1000 == 0)console.log(this.name, this.keys.length);
         }
 
         if (!this.batchMode)
@@ -1518,6 +1521,7 @@ class Anim extends Events
     getSerialized()
     {
 
+        /* minimalcore:start */
         /** @type {SerializedAnim} */
         const obj = {};
         obj.keys = [];
@@ -1529,6 +1533,8 @@ class Anim extends Events
             obj.keys.push(this.keys[i].getSerialized());
 
         return obj;
+
+    /* minimalcore:end */
     }
 
     /**
@@ -1639,14 +1645,6 @@ class Anim extends Events
      */
     getValue(time = 0)
     {
-        // if (isNaN(time))time = 0;
-        // counts[this.name] = counts[this.name] || 0;
-        // if (counts[this.name] < 10 && this.port)
-        // {
-        //     console.log("getvalue", this.name, time, this);
-        //     CABLES.logStack();
-        //     counts[this.name]++;
-        // }
 
         let valAdd = 0;
         if (this.keys.length === 0) return 0;
@@ -1706,7 +1704,6 @@ class Anim extends Events
         {
             if (!key1.clip && this.port)
             {
-
                 const patch = this.port.op.patch;
                 const clip = patch.getVar(key1.clipId)?.getValue();
                 if (clip) key1.clip = clip;
@@ -1717,7 +1714,7 @@ class Anim extends Events
             }
             else
             {
-                console.log("no clip found");
+                this.#log.warn("no clip found");
             }
         }
 
@@ -1731,7 +1728,7 @@ class Anim extends Events
     {
         if (k.time === undefined)
         {
-            this._log.warn("key time undefined, ignoring!");
+            this.#log.warn("key time undefined, ignoring!");
         }
         else
         {
@@ -1758,6 +1755,7 @@ class Anim extends Events
         if (str == "smoothstep") return Anim.EASING_SMOOTHSTEP;
         if (str == "smootherstep") return Anim.EASING_SMOOTHERSTEP;
 
+        /* minimalcore:start */
         if (str == "Cubic In") return Anim.EASING_CUBIC_IN;
         if (str == "Cubic Out") return Anim.EASING_CUBIC_OUT;
         if (str == "Cubic In Out") return Anim.EASING_CUBIC_INOUT;
@@ -1788,7 +1786,8 @@ class Anim extends Events
         if (str == "Quint In") return Anim.EASING_QUINT_IN;
         if (str == "Quint In Out") return Anim.EASING_QUINT_INOUT;
 
-        console.log("unknown anim easing?", str);
+        /* minimalcore:end */
+        this.#log.warn("unknown anim easing?", str);
     }
 
     /**
@@ -1888,6 +1887,7 @@ const CONSTANTS = {
         "EASING_SMOOTHERSTEP": 3,
         "EASING_CUBICSPLINE": 4,
 
+        /* minimalcore:start */
         "EASING_CUBIC_IN": 5,
         "EASING_CUBIC_OUT": 6,
         "EASING_CUBIC_INOUT": 7,
@@ -1917,6 +1917,8 @@ const CONSTANTS = {
         "EASING_QUINT_IN": 25,
         "EASING_QUINT_OUT": 26,
         "EASING_QUINT_INOUT": 27,
+
+        /* minimalcore:end */
         "EASING_CLIP": 28,
     },
 
@@ -2013,8 +2015,8 @@ Math.seededRandom = function (max, min)
 };
 
 /**
-     * @namespace String
-     */
+ * @namespace String
+ */
 
 /**
  * append a linebreak to a string
@@ -2026,13 +2028,15 @@ String.prototype.endl = function ()
     return this + "\n";
 };
 
+/* minimalcore:start */
 String.prototype.contains = function (str)
 {
-    console.warn("string.contains deprecated, use string.includes");
-    console.log((new Error()).stack);
+    console.warn("string.contains deprecated, use string.includes"); // eslint-disable-line
+    console.log((new Error()).stack); // eslint-disable-line
     return this.includes(str);
-
 };
+
+/* minimalcore:end */
 
 function extendJs() {}
 
@@ -2040,6 +2044,7 @@ function extendJs() {}
 /**
  * @namespace external:CABLES#Utils
  */
+
 
 
 
@@ -2093,6 +2098,7 @@ const getShortOpName = function (fullname)
  * @return {Array|Float32Array} shuffled array
  * @static
  */
+/* minimalcore:start */
 const shuffleArray = function (array)
 {
     for (let i = array.length - 1; i > 0; i--)
@@ -2104,6 +2110,8 @@ const shuffleArray = function (array)
     }
     return array;
 };
+
+/* minimalcore:end */
 
 /**
  * generate a short "relativly unique" id
@@ -2132,19 +2140,11 @@ const shortId = function ()
  * @return {UUID} generated UUID
  * @static
  */
-const uuid = function ()
-{
-    let d = new Date().getTime();
-    const uuidStr = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) =>
-    {
-        const r = (d + Math.random() * 16) % 16 | 0;
-        d = Math.floor(d / 16);
-        return (c == "x" ? r : (r & 0x3) | 0x8).toString(16);
-    });
-    return uuidStr;
-};
+const uuid = helper.uuid;
 const generateUUID = uuid;
+const isNumeric = helper.isNumeric;
 
+/* minimalcore:start */
 function cleanJson(obj)
 {
     for (const i in obj)
@@ -2158,6 +2158,7 @@ function cleanJson(obj)
     return obj;
 }
 
+/* minimalcore:end */
 /**
  * @see http://stackoverflow.com/q/7616461/940217
  * @param {string} str
@@ -2237,12 +2238,13 @@ const clamp = function (value, min, max)
  * @param {Number} _newMin new range minimum value
  * @param {Number} _newMax new range maximum value
  * @param {Number} _easing
+ * @param {Boolean} clampval
  * @return {Number} mapped value
  * @static
  */
-const map = function (x, _oldMin, _oldMax, _newMin, _newMax, _easing = 0, clamp = true)
+const map = function (x, _oldMin, _oldMax, _newMin, _newMax, _easing = 0, clampval = true)
 {
-    if (clamp)
+    if (clampval)
     {
         if (x >= _oldMax) return _newMax;
         if (x <= _oldMin) return _newMin;
@@ -2287,24 +2289,12 @@ const map = function (x, _oldMin, _oldMax, _newMin, _newMax, _easing = 0, clamp 
 // ----------------------------------------------------------------
 
 /**
- * returns true if parameter is a number
- * @param {any} n value The value to check.
- * @return {Boolean}
- * @static
- */
-function isNumeric(n)
-{
-    return !isNaN(parseFloat(n)) && isFinite(n);
-}
-
-// ----------------------------------------------------------------
-
-/**
  * append a unique/random parameter to a url, so the browser is forced to reload the file, even if its cached
  * @static
  * @param {String} url The url to append the cachebuster parameter to.
  * @return {String} url with cachebuster parameter
  */
+/* minimalcore:start */
 const cacheBust = function (url = "")
 {
     if (!url) return "";
@@ -2313,6 +2303,8 @@ const cacheBust = function (url = "")
     else url += "?";
     return url + "cache=" + CABLES.uuid();
 };
+
+/* minimalcore:end */
 
 /**
  * copy the content of an array
@@ -2354,6 +2346,7 @@ const basename = function (url)
  */
 const logStack = function ()
 {
+    // eslint-disable-next-line
     console.log("logstack", (new Error()).stack);
 };
 
@@ -2385,6 +2378,7 @@ const filename = function (url)
     return name || "";
 };
 
+/* minimalcore:start */
 /**
  * make an ajax request
  * @static
@@ -2485,6 +2479,7 @@ function request(options)
     }
 }
 
+/* minimalcore:end */
 // ----------------------------------------------------------------
 
 const logErrorConsole = function (initiator)
@@ -2660,6 +2655,7 @@ class Port extends Events
     static EVENT_LINK_CHANGED = "onLinkChanged";
     static EVENT_LINK_REMOVED = "onLinkRemoved";
 
+    #log = new Logger("core_port");
     #oldAnimVal = -5711;
 
     animMuted = false;
@@ -2683,7 +2679,6 @@ class Port extends Events
     {
         super();
         this.data = {}; // UNUSED, DEPRECATED, only left in for backwards compatibility with userops
-        this._log = new Logger("core_port");
 
         /**
          * @type {Number}
@@ -2734,7 +2729,7 @@ class Port extends Events
 
     get parent()
     {
-        this._log.stack("use port.op, not .parent");
+        this.#log.stack("use port.op, not .parent");
         return this.op;
     }
 
@@ -2772,12 +2767,16 @@ class Port extends Events
      */
     copyLinkedUiAttrib(which, port)
     {
+
+        /* minimalcore:start */
         if (!CABLES.UI) return;
         if (!this.isLinked()) return;
 
         const attr = {};
         attr[which] = this.links[0].getOtherPort(this).getUiAttrib(which);
         port.setUiAttribs(attr);
+
+    /* minimalcore:end */
     }
 
     /*
@@ -2785,6 +2784,8 @@ class Port extends Events
      */
     getValueForDisplay()
     {
+
+        /* minimalcore:start */
         let str = this.value;
 
         if (typeof this.value === "string" || this.value instanceof String)
@@ -2802,7 +2803,7 @@ class Port extends Events
                 else str += "true";
             }
 
-            str = str.replace(/[\u00A0-\u9999<>\&]/g, function (/** @type {String} */ i)
+            str = str.replace(/[\u00A0-\u9999<>&]/g, function (/** @type {String} */ i)
             {
                 return "&#" + i.charCodeAt(0) + ";";
             });
@@ -2813,11 +2814,9 @@ class Port extends Events
         {
             str = String(this.value);
         }
-        // if (this.type == Port.TYPE_NUMBER)
-        // {
-        //     if (isNaN(this.value)) return "NaN";
-        // }
         return str;
+
+    /* minimalcore:end */
     }
 
     /**
@@ -2854,6 +2853,8 @@ class Port extends Events
      */
     setUiAttribs(newAttribs)
     {
+
+        /* minimalcore:start */
         let changed = false;
         if (!this.uiAttribs) this.uiAttribs = {};
 
@@ -2873,6 +2874,8 @@ class Port extends Events
         if (newAttribs.hasOwnProperty("expose")) this.#op.patch.emitEvent("subpatchExpose", this.#op.uiAttribs.subPatch);
 
         if (changed) this.emitEvent(Port.EVENT_UIATTRCHANGE, newAttribs, this);
+
+    /* minimalcore:end */
     }
 
     /**
@@ -2896,8 +2899,12 @@ class Port extends Events
      */
     getUiAttrib(attribName)
     {
+
+        /* minimalcore:start */
         if (!this.uiAttribs || !this.uiAttribs.hasOwnProperty(attribName)) return null;
         return this.uiAttribs[attribName];
+
+    /* minimalcore:end */
     }
 
     /**
@@ -2928,20 +2935,20 @@ class Port extends Events
     }
 
     /**
-     * @param {object|array} v
-     */
-    setRef(v)
-    {
-        this.forceRefChange = true;
-        this.set(v);
-    }
-
-    /**
      * @description set value of port / will send value to all linked ports (only for output ports)
      * @param {string | number | boolean | any[]} v
      */
     set(v)
     {
+        this.setValue(v);
+    }
+
+    /**
+     * @param {object|array} v
+     */
+    setRef(v)
+    {
+        this.forceRefChange = true;
         this.setValue(v);
     }
 
@@ -2953,8 +2960,15 @@ class Port extends Events
         if (v === undefined) v = null;
 
         if (CABLES.UI && CABLES.UI.showDevInfos)
-            if (this.direction == CONSTANTS.PORT.PORT_DIR_OUT && this.type == Port.TYPE_OBJECT && v && !this.forceRefChange)
-                this._log.warn("object port [" + this.name + "] uses .set [" + this.op.objName + "]");
+        {
+            CABLES.UI.countSetWarns = CABLES.UI.countSetWarns || 0;
+            if (CABLES.UI.countSetWarns < 20 && this.direction == CONSTANTS.PORT.PORT_DIR_OUT && this.type == Port.TYPE_OBJECT && v && !this.forceRefChange)
+            {
+                this.#log.warn("object port [" + this.name + "] uses .set [" + this.op.objName + "]");
+
+                CABLES.UI.countSetWarns++;
+            }
+        }
 
         if (this.#op.enabled && !this.crashed)
         {
@@ -2986,8 +3000,8 @@ class Port extends Events
                         this.setValue = function (_v) {};
                         this.onTriggered = function () {};
 
-                        this._log.error("exception in ", this.#op);
-                        this._log.error(ex);
+                        this.#log.error("exception in ", this.#op);
+                        this.#log.error(ex);
 
                         this.#op.patch.emitEvent("exception", ex, this.#op);
                     }
@@ -3031,19 +3045,6 @@ class Port extends Events
         else if (this.onValueChanged) this.onValueChanged(this, this.value); // deprecated
     }
 
-    static getTypeString(t)
-    {
-        // todo:needed only in ui ?remove from core?
-
-        if (t == Port.TYPE_VALUE) return "Number";
-        if (t == Port.TYPE_FUNCTION) return "Trigger";
-        if (t == Port.TYPE_OBJECT) return "Object";
-        if (t == Port.TYPE_DYNAMIC) return "Dynamic";
-        if (t == Port.TYPE_ARRAY) return "Array";
-        if (t == Port.TYPE_STRING) return "String";
-        return "Unknown";
-    }
-
     /**
      * @description get port type as string, e.g. "Function","Value"...
      * @return {String} type
@@ -3061,9 +3062,13 @@ class Port extends Events
         if (!objPort) return;
         if (objPort.animated) this.setAnimated(objPort.animated);
         if (objPort.useVariable) this.setVariableName(objPort.useVariable);
+
+        /* minimalcore:start */
         if (objPort.title) this.setUiAttribs({ "title": objPort.title });
         if (objPort.expose) this.setUiAttribs({ "expose": true });
         if (objPort.order) this.setUiAttribs({ "order": objPort.order });
+
+        /* minimalcore:end */
 
         if (objPort.multiPortManual) this.setUiAttribs({ "multiPortManual": objPort.multiPortManual });
         if (objPort.multiPortNum) this.setUiAttribs({ "multiPortNum": objPort.multiPortNum });
@@ -3111,6 +3116,8 @@ class Port extends Events
 
     getSerialized()
     {
+
+        /* minimalcore:start */
         let obj = { "name": this.getName() };
 
         if (!this.ignoreValueSerialize && this.links.length === 0)
@@ -3167,6 +3174,8 @@ class Port extends Events
         cleanJson(obj);
 
         return obj;
+
+        /* minimalcore:end */
     }
 
     /**
@@ -3189,13 +3198,18 @@ class Port extends Events
         while (this.links.length > 0)
         {
             count++;
+
+            /* minimalcore:start */
             if (count > 5000)
             {
-                this._log.warn("could not delete links... / infinite loop");
+                this.#log.warn("could not delete links... / infinite loop");
                 this.links.length = 0;
                 break;
             }
+
+            /* minimalcore:end */
             this.links[0].remove();
+            this.op.patch.emitEvent("onPortUnlink", this);
         }
     }
 
@@ -3215,7 +3229,10 @@ class Port extends Events
             else this.setValue(this.#valueBeforeLink || null);
         }
 
+        /* minimalcore:start */
         if (CABLES.UI && this.#op.checkLinkTimeWarnings) this.#op.checkLinkTimeWarnings();
+
+        /* minimalcore:end */
 
         try
         {
@@ -3223,10 +3240,11 @@ class Port extends Events
             this.emitEvent(Port.EVENT_LINK_CHANGED);
             this.emitEvent(Port.EVENT_LINK_REMOVED);
             this.#op.emitEvent(Port.EVENT_LINK_CHANGED);
+            this.op.patch.emitEvent("onPortUnlink", this);
         }
         catch (e)
         {
-            this._log.error(e);
+            this.#log.error(e);
         }
     }
 
@@ -3254,7 +3272,11 @@ class Port extends Events
     {
         this.#valueBeforeLink = this.value;
         this.links.push(l);
+
+        /* minimalcore:start */
         if (CABLES.UI && this.#op.checkLinkTimeWarnings) this.#op.checkLinkTimeWarnings();
+
+        /* minimalcore:end */
 
         try
         {
@@ -3264,7 +3286,7 @@ class Port extends Events
         }
         catch (e)
         {
-            this._log.error(e);
+            this.#log.error(e);
         }
     }
 
@@ -3288,11 +3310,16 @@ class Port extends Events
             if (this.links[i].portIn == p2 || this.links[i].portOut == p2)
             {
                 this.links[i].remove();
+
+                /* minimalcore:start */
                 if (CABLES.UI && this.#op.checkLinkTimeWarnings) this.#op.checkLinkTimeWarnings();
+
+                /* minimalcore:end */
 
                 if (this.onLinkChanged) this.onLinkChanged();
                 this.emitEvent(Port.EVENT_LINK_CHANGED);
                 this.emitEvent(Port.EVENT_LINK_REMOVED);
+                this.op.patch.emitEvent("onPortUnlink", this);
                 return;
             }
         }
@@ -3337,9 +3364,10 @@ class Port extends Events
                     portTriggered.op.patch.pushTriggerStack(portTriggered);
                     if (!portTriggered._onTriggered)
                     {
-                        console.log(portTriggered, portTriggered._onTriggered);
+                        this.#log.log("no porttriggered?!", portTriggered, portTriggered._onTriggered); // eslint-disable-line
                     }
-                    portTriggered._onTriggered();
+                    else
+                        portTriggered._onTriggered();
 
                     portTriggered.op.patch.popTriggerStack();
                 }
@@ -3348,8 +3376,9 @@ class Port extends Events
         }
         catch (ex)
         {
-            if (!portTriggered) return console.error("unknown port error");
+            if (!portTriggered) return this.#log.error("unknown port error");
 
+            /* minimalcore:start */
             portTriggered.op.enabled = false;
             portTriggered.op.setUiError("crash", "op crashed, port exception " + portTriggered.name, 3);
 
@@ -3357,16 +3386,21 @@ class Port extends Events
             {
                 if (portTriggered.op.onError) portTriggered.op.onError(ex);
             }
-            this._log.error("exception in port: ", portTriggered.name, portTriggered.op.name, portTriggered.op.id);
-            this._log.error(ex);
+
+            /* minimalcore:end */
+            this.#log.error("exception in port: ", portTriggered.name, portTriggered.op.name, portTriggered.op.id);
+            this.#log.error(ex);
         }
     }
 
+    /* minimalcore:start */
     call()
     {
-        this._log.warn("call deprecated - use trigger() ");
+        this.#log.warn("call deprecated - use trigger() ");
         this.trigger();
     }
+
+    /* minimalcore:end */
 
     execute()
     {
@@ -3521,10 +3555,14 @@ class Port extends Events
 
     toggleAnim()
     {
+
+        /* minimalcore:start */
         this.setAnimated(!this.#animated);
         this.setUiAttribs({ "isAnimated": this.#animated });
         this.#op.patch.emitEvent("portAnimUpdated", this.#op, this, this.anim);
         this.#op.patch.emitEvent("portAnimToggle", this.#op, this, this.anim);
+
+        /* minimalcore:end */
     }
 
     /**
@@ -3589,64 +3627,6 @@ class Port extends Events
     }
 
     /**
-     * @param {any} v
-     */
-    _onSetProfiling(v) // used in editor: profiler tab
-    {
-        if (this.op.patch.debuggerEnabled)
-        {
-            // console.log(this.op.name + " - port " + this.name + ": set value to " + v);
-            const cv = v;
-
-            this.op.patch.emitEvent("debuggerstep",
-                {
-                    "opname": this.op.name,
-                    "opid": this.op.id,
-                    "portname": this.name,
-                    "log": this.op.name + " - port " + this.name + ": set value to " + v,
-                    "exec": () =>
-                    {
-                        this.setValue(cv);
-                    }
-                });
-            return;
-        }
-
-        this.#op.patch.profiler.add("port", this);
-        this.setValue(v);
-        this.#op.patch.profiler.add("port", null);
-    }
-
-    _onTriggeredProfiling() // used in editor: profiler tab
-    {
-        if (this.#op.enabled && this.onTriggered)
-        {
-            if (this.op.patch.debuggerEnabled)
-            {
-                console.log();
-                this.op.patch.emitEvent("debuggerstep",
-                    {
-                        "opname": this.op.name,
-                        "opid": this.op.id,
-                        "portname": this.name,
-                        "log": this.op.name + " - triggered " + this.name,
-                        "exec": () =>
-                        {
-                            this.onTriggered();
-                        }
-
-                    });
-                return;
-
-            }
-
-            this.#op.patch.profiler.add("port", this);
-            this.onTriggered();
-            this.#op.patch.profiler.add("port", null);
-        }
-    }
-
-    /**
      * @deprecated
      * @param {function} cb
      */
@@ -3667,6 +3647,8 @@ class Port extends Events
      */
     static portTypeNumberToString(type)
     {
+
+        /* minimalcore:start */
         if (type == Port.TYPE_VALUE) return "value";
         if (type == Port.TYPE_FUNCTION) return "function";
         if (type == Port.TYPE_OBJECT) return "object";
@@ -3674,7 +3656,26 @@ class Port extends Events
         if (type == Port.TYPE_STRING) return "string";
         if (type == Port.TYPE_DYNAMIC) return "dynamic";
         return "unknown";
+
+        /* minimalcore:end */
     }
+
+    static getTypeString(t)
+    {
+        // todo:needed only in ui ?remove from core?
+
+        /* minimalcore:start */
+        if (t == Port.TYPE_VALUE) return "Number";
+        if (t == Port.TYPE_FUNCTION) return "Trigger";
+        if (t == Port.TYPE_OBJECT) return "Object";
+        if (t == Port.TYPE_DYNAMIC) return "Dynamic";
+        if (t == Port.TYPE_ARRAY) return "Array";
+        if (t == Port.TYPE_STRING) return "String";
+        return "Unknown";
+
+        /* minimalcore:end */
+    }
+
 }
 
 ;// CONCATENATED MODULE: ./src/core/core_link.js
@@ -3690,6 +3691,7 @@ class Port extends Events
  */
 class Link extends Events
 {
+    #log = new Logger("link");
 
     /**
      * @param {Patch} p
@@ -3700,19 +3702,13 @@ class Link extends Events
 
         this.id = CABLES.simpleId();
 
-        /**
-         * @type {Port}
-         */
+        /** @type {Port} */
         this.portIn = null;
 
-        /**
-         * @type {Port}
-         */
+        /** @type {Port} */
         this.portOut = null;
 
-        /**
-         * @type {Patch}
-         */
+        /** @type {Patch} */
         this._patch = p;
         this.activityCounter = 0;
         this.ignoreInSerialize = false;
@@ -3811,7 +3807,7 @@ class Link extends Events
     {
         if (!Link.canLink(p1, p2))
         {
-            console.warn("[core_link] cannot link ports!", p1, p2);
+            this.#log.warn("[core_link] cannot link ports!", p1, p2);
             return false;
         }
 
@@ -3837,6 +3833,8 @@ class Link extends Events
 
     getSerialized()
     {
+
+        /* minimalcore:start */
         const obj = {};
 
         obj.portIn = this.portIn.getName();
@@ -3845,6 +3843,8 @@ class Link extends Events
         obj.objOut = this.portOut.op.id;
 
         return obj;
+
+        /* minimalcore:end */
     }
 
     /**
@@ -3855,6 +3855,8 @@ class Link extends Events
      */
     static canLinkText(p1, p2)
     {
+
+        /* minimalcore:start */
         if (p1.direction == p2.direction)
         {
             let txt = "(out)";
@@ -3885,6 +3887,8 @@ class Link extends Events
         if ((p1.canLink && !p1.canLink(p2)) || (p2.canLink && !p2.canLink(p1))) return "Incompatible";
 
         return "can link";
+
+        /* minimalcore:end */
     }
 
     /**
@@ -3896,6 +3900,8 @@ class Link extends Events
      */
     static canLink(p1, p2)
     {
+
+        /* minimalcore:start */
         if (!p1) return false;
         if (!p2) return false;
         if (p1.direction == Port.DIR_IN && p1.isAnimated()) return false;
@@ -3925,6 +3931,7 @@ class Link extends Events
         if (p1.canLink && !p1.canLink(p2)) return false;
         if (p2.canLink && !p2.canLink(p1)) return false;
 
+        /* minimalcore:end */
         return true;
     }
 }
@@ -4159,6 +4166,69 @@ class LoadingStatus extends Events
     }
 }
 
+;// CONCATENATED MODULE: ./src/core/core_variable.js
+
+
+class PatchVariable extends Events
+{
+    #name;
+
+    /**
+     * @param {String} name
+     * @param {String|Number} val
+     * @param {number} type
+     */
+    constructor(name, val, type)
+    {
+        super();
+        this.#name = name;
+        this.type = type;
+        this.setValue(val);
+    }
+
+    /**
+     * keeping this for backwards compatibility in older
+     * exports before using eventtarget
+     *
+     * @param cb
+     */
+    addListener(cb)
+    {
+        this.on("change", cb, "var");
+    }
+
+    /**
+     * @returns {String|Number|Boolean|Object}
+     */
+    getValue()
+    {
+        return this._v;
+    }
+
+    get name()
+    {
+        return this.#name;
+    }
+
+    /**
+     * @returns {String|Number|Boolean}
+     */
+    getName()
+    {
+        return this.#name;
+    }
+
+    /**
+     * @param {string | number} v
+     * @returns {any}
+     */
+    setValue(v)
+    {
+        this._v = v;
+        this.emitEvent("change", v, this);
+    }
+}
+
 ;// CONCATENATED MODULE: ./src/core/timer.js
 
 
@@ -4189,7 +4259,7 @@ const now = function ()
 class Timer extends Events
 {
     static EVENT_PLAY_PAUSE = "playPause";
-    static EVENT_TIME_CHANGED = "timeChanged";
+    static EVENT_TIME_CHANGED = "timeChange";
 
     #lastTime = 0;
     #timeOffset = 0;
@@ -4342,211 +4412,6 @@ class Timer extends Events
 
 
 
-;// CONCATENATED MODULE: ./src/core/core_profiler.js
-
-
-
-/**
- * @typedef ProfilerItem
- * @property  {String} [title] overwrite title of port (by default this is portname)
- * @property numTriggers {number}
- * @property timeUsed {number}
- * @property timeUsedFrame {number}
- * @property opid {string}
- * @property subPatch {string}
-
- * @property timePsMsAvg {number}
- * @property timePsMs {number}
- * @property timePsCount {number}
- * @property _timePsCount {number}
- * @property _timePsStart {number}
- * @property _timePsMs {number}
- */
-
-class Profiler
-{
-
-    /**
-     * @param {Patch} patch
-     */
-    constructor(patch)
-    {
-        this.startFrame = patch.getFrameNum();
-
-        /** @type {Object.<string, ProfilerItem>} */
-        this.items = {};
-        this.currentId = null;
-        this.currentStart = 0;
-        this._patch = patch;
-    }
-
-    getItems()
-    {
-        return this.items;
-    }
-
-    clear()
-    {
-        this.currentStart = performance.now();
-        if (this.paused) return;
-        this.items = {};
-    }
-
-    togglePause()
-    {
-        this.paused = !this.paused;
-        if (!this.paused)
-        {
-            this.items = {};
-            this.currentStart = performance.now();
-        }
-    }
-
-    /**
-     * @param {any} type
-     * @param {Object} object
-     */
-    add(type, object)
-    {
-        if (this.paused) return;
-
-        if (this.currentId !== null)
-        {
-            if (!object || object.id != this.currentId)
-            {
-                const item = this.items[this.currentId];
-                if (item)
-                {
-                    item.timeUsed += performance.now() - this.currentStart;
-                    item._timePsCount++;
-                    item._timePsMs += performance.now() - this.currentStart;
-
-                    if (item._timePsStart == 0 || performance.now() > item._timePsStart + 1000)
-                    {
-                        item.timePsMs = item._timePsMs;
-                        item.timePsMsAvg = item._timePsMs / item._timePsCount;
-                        item.timePsCount = item._timePsCount;
-                        item._timePsCount = 0;
-                        item._timePsMs = 0;
-                        item._timePsStart = performance.now();
-                    }
-
-                    if (!item.peakTime || now() - item.peakTime > 5000)
-                    {
-                        item.peak = 0;
-                        item.peakTime = now();
-                    }
-                    item.peak = Math.max(item.peak, performance.now() - this.currentStart);
-                }
-            }
-        }
-
-        if (object !== null)
-        {
-            if (!this.items[object.id])
-            {
-                this.items[object.id] = {
-                    "numTriggers": 0,
-                    "timeUsed": 0,
-                    "timeUsedFrame": 0,
-                    "timePsMsAvg": 0,
-                    "timePsMs": 0,
-                    "_timePsCount": 0,
-                    "_timePsMs": 0,
-                    "_timePsStart": performance.now()
-                };
-            }
-
-            if (this.items[object.id].lastFrame != this._patch.getFrameNum()) this.items[object.id].numTriggers = 0;
-
-            this.items[object.id].lastFrame = this._patch.getFrameNum();
-            this.items[object.id].numTriggers++;
-            this.items[object.id].opid = object.op.id;
-            this.items[object.id].title = object.op.name + "." + object.name;
-            this.items[object.id].subPatch = object.op.uiAttribs.subPatch;
-
-            this.currentId = object.id;
-            this.currentStart = performance.now();
-        }
-        else
-        {
-            this.currentId = null;
-        }
-    }
-
-    print()
-    {
-        console.log("--------");
-        for (const i in this.items)
-        {
-            console.log(this.items[i].title + ": " + this.items[i].numTriggers + " / " + this.items[i].timeUsed);
-        }
-    }
-}
-
-;// CONCATENATED MODULE: ./src/core/core_variable.js
-
-
-class PatchVariable extends Events
-{
-    #name;
-
-    /**
-     * @param {String} name
-     * @param {String|Number} val
-     * @param {number} type
-     */
-    constructor(name, val, type)
-    {
-        super();
-        this.#name = name;
-        this.type = type;
-        this.setValue(val);
-    }
-
-    /**
-     * keeping this for backwards compatibility in older
-     * exports before using eventtarget
-     *
-     * @param cb
-     */
-    addListener(cb)
-    {
-        this.on("change", cb, "var");
-    }
-
-    /**
-     * @returns {String|Number|Boolean|Object}
-     */
-    getValue()
-    {
-        return this._v;
-    }
-
-    get name()
-    {
-        return this.#name;
-    }
-
-    /**
-     * @returns {String|Number|Boolean}
-     */
-    getName()
-    {
-        return this.#name;
-    }
-
-    /**
-     * @param {string | number} v
-     * @returns {any}
-     */
-    setValue(v)
-    {
-        this._v = v;
-        this.emitEvent("change", v, this);
-    }
-}
-
 ;// CONCATENATED MODULE: ./src/core/core_patch.js
 
 
@@ -4635,7 +4500,9 @@ class Patch extends Events
     static EVENT_VALUESSET = "loadedValueSet";
     static EVENT_DISPOSE = "dispose";
     static EVENT_ANIM_MAXTIME_CHANGE = "animmaxtimechange";
+    static EVENT_INIT_CGL = "INIT_CGL";
 
+    #log;
     #renderOneFrame = false;
     #initialDeserialize = true;
 
@@ -4645,14 +4512,25 @@ class Patch extends Events
     animMaxTime = 0;
     missingClipAnims = {};
 
-    // animFrameCallbacks = [];
+    profiler = null;
+    aborted = false;
+    _crashedOps = [];
+    animFrameOps = [];
+    _animReq = null;
+    _opIdCache = {};
+    _triggerStack = [];
+    storeObjNames = false; // remove after may release
+    _volumeListeners = [];
+    namedTriggers = {};
+
+    _origData = null;
+    tempData = {};
+    frameStore = {};
 
     /** @param {PatchConfig} cfg */
     constructor(cfg)
     {
         super();
-
-        this._log = new Logger("core_patch", { "onError": cfg.onError });
 
         /** @type {RenderLoop} */
         this.renderloop = null;
@@ -4672,30 +4550,17 @@ class Patch extends Events
 
         };
 
+        this.#log = new Logger("core_patch", { "onError": cfg.onError });
         this.timer = new Timer();
         this.freeTimer = new Timer();
-        this.animFrameOps = [];
-        this.gui = false;
+        this.gui = null;
         CABLES.logSilent = this.silent = true;
-        this.profiler = null;
-        this.aborted = false;
-        this._crashedOps = [];
-
-        this._animReq = null;
-        this._opIdCache = {};
-        this._triggerStack = [];
-        this.storeObjNames = false; // remove after may release
 
         /** @type {LoadingStatus} */
         this.loading = new LoadingStatus(this);
 
-        this._volumeListeners = [];
-        this.namedTriggers = {};
-
-        this._origData = null;
-        this.tempData = this.frameStore = {};
-
-        if (!(function () { return !this; }())) console.log("not in strict mode: core patch");
+        /* minimalcore:start */
+        if (!(function () { return !this; }())) this.#log.warn("not in strict mode: core patch");
 
         if (this.config.hasOwnProperty("silent")) this.silent = CABLES.logSilent = this.config.silent;
         if (!this.config.hasOwnProperty("doRequestAnimation")) this.config.doRequestAnimation = true;
@@ -4703,6 +4568,8 @@ class Patch extends Events
         if (!this.config.prefixAssetPath) this.config.prefixAssetPath = "";
         if (!this.config.prefixJsPath) this.config.prefixJsPath = "";
         if (!this.config.masterVolume) this.config.masterVolume = 1.0;
+
+        /* minimalcore:end */
 
         /** @type {Object<string,PatchVariable>} */
         this._variables = {};
@@ -4714,7 +4581,7 @@ class Patch extends Events
         this.cgp = null;
 
         this._subpatchOpCache = {};
-        window.dispatchEvent(new CustomEvent("INIT_CG", { "detail": this }));
+        window.dispatchEvent(new CustomEvent(Patch.EVENT_INIT_CGL, { "detail": this }));
 
         this.loading.setOnFinishedLoading(this.config.onFinishedLoading);
 
@@ -4743,16 +4610,16 @@ class Patch extends Events
                         if (err)
                         {
                             const txt = "";
-                            this._log.error("err", err);
-                            this._log.error("data", data);
-                            this._log.error("data", data.msg);
+                            this.#log.error("err", err);
+                            this.#log.error("data", data);
+                            this.#log.error("data", data.msg);
                             return;
                         }
                         this.deSerialize(data);
                     }
                     catch (e)
                     {
-                        this._log.error("could not load/parse patch ", e);
+                        this.#log.error("could not load/parse patch ", e);
                     }
                 }
             );
@@ -4763,11 +4630,14 @@ class Patch extends Events
         this.cg = undefined;
     }
 
+    /* minimalcore:start */
     static getGui()
     {
         // @ts-ignore
         return window.gui;
     }
+
+    /* minimalcore:end */
 
     isPlaying()
     {
@@ -4910,8 +4780,8 @@ class Patch extends Events
         {
             if (!identifier)
             {
-                console.error("createop identifier false", identifier);
-                console.log((new Error()).stack);
+                console.error("createop identifier false", identifier);// eslint-disable-line
+                console.log((new Error()).stack);// eslint-disable-line
                 return;
             }
             if (identifier.indexOf("Ops.") === -1)
@@ -4933,10 +4803,12 @@ class Patch extends Events
                     catch (e)
                     {
                         this._crashedOps.push(objName);
-                        this._log.error("[instancing error] constructor: " + objName, e);
+                        this.#log.error("[instancing error] constructor: " + objName, e);
+
+                        /* minimalcore:start */
                         if (!this.isEditorMode())
                         {
-                            this._log.error("INSTANCE_ERR", "Instancing Error: " + objName, e);
+                            this.#log.error("INSTANCE_ERR", "Instancing Error: " + objName, e);
                         }
                         else
                         {
@@ -4946,6 +4818,8 @@ class Patch extends Events
                             op.setEnabled(false);
                             if (this.#initialDeserialize) Patch.getGui().patchView.store.opCrashed = true;
                         }
+
+                        /* minimalcore:end */
                     }
                     op.opId = opId;
                 }
@@ -4954,7 +4828,7 @@ class Patch extends Events
                     if (opName)
                     {
                         identifier = opName;
-                        this._log.warn("could not find op by id: " + opId);
+                        this.#log.warn("could not find op by id: " + opId);
                     }
                     else
                     {
@@ -4974,21 +4848,12 @@ class Patch extends Events
                 {
                     this.emitEvent("criticalError", { "title": "Unknown op: " + objName, "text": "Unknown op: " + objName });
 
-                    this._log.error("unknown op: " + objName);
+                    this.#log.error("unknown op: " + objName);
                     throw new Error("unknown op: " + objName);
                 }
                 else
                 {
-                    if (parts.length == 2) op = new window[parts[0]][parts[1]](this, objName, id);
-                    else if (parts.length == 3) op = new window[parts[0]][parts[1]][parts[2]](this, objName, id);
-                    else if (parts.length == 4) op = new window[parts[0]][parts[1]][parts[2]][parts[3]](this, objName, id);
-                    else if (parts.length == 5) op = new window[parts[0]][parts[1]][parts[2]][parts[3]][parts[4]](this, objName, id);
-                    else if (parts.length == 6) op = new window[parts[0]][parts[1]][parts[2]][parts[3]][parts[4]][parts[5]](this, objName, id);
-                    else if (parts.length == 7) op = new window[parts[0]][parts[1]][parts[2]][parts[3]][parts[4]][parts[5]][parts[6]](this, objName, id);
-                    else if (parts.length == 8) op = new window[parts[0]][parts[1]][parts[2]][parts[3]][parts[4]][parts[5]][parts[6]][parts[7]](this, objName, id);
-                    else if (parts.length == 9) op = new window[parts[0]][parts[1]][parts[2]][parts[3]][parts[4]][parts[5]][parts[6]][parts[7]][parts[8]](this, objName, id);
-                    else if (parts.length == 10) op = new window[parts[0]][parts[1]][parts[2]][parts[3]][parts[4]][parts[5]][parts[6]][parts[7]][parts[8]][parts[9]](this, objName, id);
-                    else console.log("parts.length", parts.length);
+                    op = new opObj(this, objName, id);
                 }
 
                 if (op)
@@ -5005,11 +4870,12 @@ class Patch extends Events
         {
             this._crashedOps.push(objName);
 
-            this._log.error("[instancing error] " + objName, e);
+            this.#log.error("[instancing error] " + objName, e);
 
+            /* minimalcore:start */
             if (!this.isEditorMode())
             {
-                this._log.error("INSTANCE_ERR", "Instancing Error: " + objName, e);
+                this.#log.error("INSTANCE_ERR", "Instancing Error: " + objName, e);
 
                 // throw new Error("instancing error 1" + objName);
             }
@@ -5017,6 +4883,8 @@ class Patch extends Events
             {
                 if (this.#initialDeserialize) Patch.getGui().patchView.store.opCrashed = true;
             }
+
+            /* minimalcore:end */
         }
 
         if (op)
@@ -5026,7 +4894,7 @@ class Patch extends Events
         }
         else
         {
-            this._log.log("no op was created!?", identifier, id);
+            this.#log.log("no op was created!?", identifier, id);
         }
         return op;
     }
@@ -5060,7 +4928,7 @@ class Patch extends Events
 
             if (this._opIdCache[op.id])
             {
-                this._log.warn("opid with id " + op.id + " already exists in patch!");
+                this.#log.warn("opid with id " + op.id + " already exists in patch!");
                 this.deleteOp(op.id); // strange with subpatch ops: why is this needed, somehow ops get added twice ???.....
                 // return;
             }
@@ -5077,7 +4945,7 @@ class Patch extends Events
         }
         else
         {
-            this._log.error("addop: op could not be created: ", opIdentifier);
+            this.#log.error("addop: op could not be created: ", opIdentifier);
         }
 
         return op;
@@ -5166,6 +5034,7 @@ class Patch extends Events
         }
     }
 
+    // @todo move to ui ?
     /**
      * @param {string} opid
      * @param {boolean} [tryRelink]
@@ -5189,17 +5058,22 @@ class Patch extends Events
                 if (op)
                 {
                     found = true;
+
+                    /* minimalcore:start */
                     if (tryRelink)
                     {
-                        if (op.portsIn.length > 0 && op.portsIn[0].isLinked() && (op.portsOut.length > 0 && op.portsOut[0].isLinked()))
+                        if (op.portsIn.length > 0 && op.getFirstPortIn() && op.getFirstPortIn().isLinked() && (op.portsOut.length > 0 && op.getFirstPortOut() && op.getFirstPortOut().isLinked()))
                         {
-                            if (op.portsIn[0].getType() == op.portsOut[0].getType() && op.portsIn[0].links[0])
+                            if (op.getFirstPortIn().getType() == op.getFirstPortOut().getType() &&
+                                op.getFirstPortIn().isLinked())
                             {
-                                reLinkP1 = op.portsIn[0].links[0].getOtherPort(op.portsIn[0]);
-                                reLinkP2 = op.portsOut[0].links[0].getOtherPort(op.portsOut[0]);
+                                reLinkP1 = op.getFirstPortIn()?.links[0]?.getOtherPort(op.getFirstPortIn());
+                                reLinkP2 = op.getFirstPortOut()?.links[0]?.getOtherPort(op.getFirstPortOut());
                             }
                         }
                     }
+
+                    /* minimalcore:end */
 
                     const opToDelete = this.ops[i];
                     opToDelete.removeLinks();
@@ -5213,10 +5087,13 @@ class Patch extends Events
                     if (opToDelete.onDelete) opToDelete.onDelete(reloadingOp);
                     opToDelete.cleanUp();
 
-                    if (reLinkP1 !== null && reLinkP2 !== null)
+                    /* minimalcore:start */
+                    if (reLinkP1 && reLinkP2 && reLinkP1.op && reLinkP2.op)
                     {
                         this.link(reLinkP1.op, reLinkP1.getName(), reLinkP2.op, reLinkP2.getName());
                     }
+
+                    /* minimalcore:end */
 
                     delete this._opIdCache[opid];
                     break;
@@ -5224,7 +5101,7 @@ class Patch extends Events
             }
         }
 
-        if (!found) this._log.warn("core patch deleteop: not found...", opid);
+        if (!found) this.#log.warn("core patch deleteop: not found...", opid);
     }
 
     getFrameNum()
@@ -5233,9 +5110,9 @@ class Patch extends Events
     }
 
     /**
-     * @param {number} time
-     * @param {number} delta
-     * @param {number} timestamp
+     * @param {number} [time]
+     * @param {number} [delta]
+     * @param {number} [timestamp]
      */
     updateAnims(time, delta, timestamp)
     {
@@ -5261,21 +5138,28 @@ class Patch extends Events
      */
     link(op1, port1Name, op2, port2Name, lowerCase = false, fromDeserialize = false)
     {
-        if (!op1) return this._log.warn("link: op1 is null ");
-        if (!op2) return this._log.warn("link: op2 is null");
+
+        /* minimalcore:start */
+        if (!op1) return this.#log.warn("link: op1 is null ");
+        if (!op2) return this.#log.warn("link: op2 is null");
+
+        /* minimalcore:end */
 
         const port1 = op1.getPort(port1Name, lowerCase);
         const port2 = op2.getPort(port2Name, lowerCase);
 
-        if (!port1) return this._log.warn("port1 not found! " + port1Name + " (" + op1.objName + ")");
-        if (!port2) return this._log.warn("port2 not found! " + port2Name + " of " + op2.name + "(" + op2.objName + ")", op2);
+        /* minimalcore:start */
+        if (!port1) return this.#log.warn("port1 not found! " + port1Name + " (" + op1.objName + ")");
+        if (!port2) return this.#log.warn("port2 not found! " + port2Name + " of " + op2.name + "(" + op2.objName + ")", op2);
 
         if (!port1.shouldLink(port1, port2) || !port2.shouldLink(port1, port2)) return false;
 
+        /* minimalcore:end */
         if (Link.canLink(port1, port2))
         {
             const link = new Link(this);
-            link.link(port1, port2);
+            if (port1 && port2)
+                link.link(port1, port2);
 
             this.emitEvent(Patch.EVENT_LINK, port1, port2, link, fromDeserialize);
             return link;
@@ -5288,6 +5172,8 @@ class Patch extends Events
      */
     serialize(options)
     {
+
+        /* minimalcore:start */
         const obj = {};
 
         options = options || {};
@@ -5303,18 +5189,24 @@ class Patch extends Events
 
         if (options.asObject) return obj;
         return JSON.stringify(obj);
+
+        /* minimalcore:end */
     }
 
+    /* minimalcore:start */
     getOpsByRefId(refId) // needed for instancing ops ?
     {
-        const perf = Patch.getGui().uiProfiler.start("[corepatchetend] getOpsByRefId");
+
+        // const perf = Patch.getGui().uiProfiler.start("[corepatchetend] getOpsByRefId");
         const refOps = [];
         // const ops = gui.corePatch().ops;
         for (let i = 0; i < this.ops.length; i++)
             if (this.ops[i].storage && this.ops[i].storage.ref == refId) refOps.push(this.ops[i]);
-        perf.finish();
+        // perf.finish();
         return refOps;
     }
+
+    /* minimalcore:end */
 
     /**
      * @param {String} opid
@@ -5441,7 +5333,7 @@ class Patch extends Events
             }
             catch (e)
             {
-                this._log.error("[instancing error] op data:", opData, e);
+                this.#log.error("[instancing error] op data:", opData, e);
                 // throw new Error("could not create op by id: <b>" + (opData.objName || opData.opId) + "</b> (" + opData.id + ")");
             }
 
@@ -5450,7 +5342,7 @@ class Patch extends Events
                 addedOps.push(op);
                 if (options.genIds) op.id = shortId();
                 op.portsInData = opData.portsIn;
-                op._origData = JSON.parse(JSON.stringify(opData));
+                op._origData = structuredClone(opData);
                 op.storage = opData.storage;
                 // if (opData.hasOwnProperty("disabled"))op.setEnabled(!opData.disabled);
 
@@ -5472,21 +5364,12 @@ class Patch extends Events
                             }
                             else
                             {
-
-                                /*
-                             * if (port.uiAttribs.hasOwnProperty("title"))
-                             * {
-                             *     op.preservedPortTitles = op.preservedPortTitles || {};
-                             *     op.preservedPortTitles[port.name] = port.uiAttribs.title;
-                             * }
-                             */
                                 op.preservedPortValues = op.preservedPortValues || {};
                                 op.preservedPortValues[objPort.name] = objPort.value;
                             }
                         }
                     }
 
-                // for (const ipo in opData.portsOut)
                 if (opData.portsOut)
                     for (let ipo = 0; ipo < opData.portsOut.length; ipo++)
                     {
@@ -5516,7 +5399,7 @@ class Patch extends Events
             }
 
             const timeused = Math.round(100 * (CABLES.now() - start)) / 100;
-            if (!this.silent && timeused > 5) console.log("long op init ", obj.ops[iop].objName, timeused);
+            if (!this.silent && timeused > 5) console.log("long op init ", obj.ops[iop].objName, timeused); // eslint-disable-line
         }
         this.logStartup("add ops done");
 
@@ -5606,7 +5489,7 @@ class Patch extends Events
                                             }
                                         }
 
-                                        if (!dstOp) this._log.warn("could not find op for lost link");
+                                        if (!dstOp) this.#log.warn("could not find op for lost link");
                                         else
                                         {
                                             this._addLink(
@@ -5626,8 +5509,8 @@ class Patch extends Events
                                             const op1 = this.getOpById(obj.ops[iop].portsOut[ipi2].links[ili].objIn);
                                             const op2 = this.getOpById(obj.ops[iop].portsOut[ipi2].links[ili].objOut);
 
-                                            if (!op1)console.log("could not find link op1");
-                                            if (!op2)console.log("could not find link op2");
+                                            if (!op1)console.log("could not find link op1");// eslint-disable-line
+                                            if (!op2)console.log("could not find link op2");// eslint-disable-line
 
                                             const p1Name = obj.ops[iop].portsOut[ipi2].links[ili].portIn;
 
@@ -5680,7 +5563,7 @@ class Patch extends Events
                 }
                 catch (e)
                 {
-                    console.error("op.init crash", e);
+                    console.error("op.init crash", e); // eslint-disable-line
                 }
             }
         }
@@ -5709,16 +5592,6 @@ class Patch extends Events
         this.#initialDeserialize = false;
     }
 
-    /**
-     * @param {boolean} enable
-     */
-    profile(enable)
-    {
-        this.profiler = new Profiler(this);
-        for (let i = 0; i < this.ops.length; i++)
-            this.ops[i].profile();
-    }
-
     // ----------------------
 
     /**
@@ -5736,12 +5609,14 @@ class Patch extends Events
         }
         else
         {
-            this._log.warn("variable " + name + " not found!");
+            this.#log.warn("variable " + name + " not found!");
         }
     }
 
     _sortVars()
     {
+
+        /* minimalcore:start */
         if (!this.isEditorMode()) return;
         const ordered = {};
         Object.keys(this._variables).sort(
@@ -5752,6 +5627,8 @@ class Patch extends Events
             ordered[key] = this._variables[key];
         });
         this._variables = ordered;
+
+        /* minimalcore:end */
     }
 
     /**
@@ -5818,12 +5695,13 @@ class Patch extends Events
      * @param {number} t
      * @returns {PatchVariable[]}
      */
+    /* minimalcore:start */
     getVars(t)
     {
         if (t === undefined) return this._variables;
         if (t === 1) return {};
 
-        const perf = Patch.getGui().uiProfiler.start("[corepatchetend] getVars");// todo should work event based
+        // const perf = Patch.getGui().uiProfiler.start("[corepatchetend] getVars");// todo should work event based
 
         const vars = [];
         let tStr = "";
@@ -5834,8 +5712,8 @@ class Patch extends Events
         else if (t == Port.TYPE_DYNAMIC) tStr = "dynamic";
         else
         {
-            console.log("unknown port type", t);
-            console.log(new Error().stack);
+            console.log("unknown port type", t); // eslint-disable-line
+            console.log(new Error().stack); // eslint-disable-line
         }
 
         for (const i in this._variables)
@@ -5843,42 +5721,26 @@ class Patch extends Events
             if (!this._variables[i].type || this._variables[i].type == tStr || this._variables[i].type == t) vars.push(this._variables[i]);
         }
 
-        perf.finish();
+        // perf.finish();
 
         return vars;
     }
 
-    // getVars(t)
-    // {
-    //     if (t === undefined) return this._variables;
-
-    //     const vars = [];
-    //     let tStr = "";
-    //     if (t == Port.TYPE_STRING) tStr = "string";
-    //     if (t == Port.TYPE_VALUE) tStr = "number";
-    //     if (t == Port.TYPE_ARRAY) tStr = "array";
-    //     if (t == Port.TYPE_OBJECT) tStr = "object";
-
-    //     for (const i in this._variables)
-    //     {
-    //         if (!this._variables[i].type || this._variables[i].type == tStr || this._variables[i].type == t) vars.push(this._variables[i]);
-    //     }
-    //     return vars;
-    // }
+    /* minimalcore:end */
 
     /**
      * @description invoke pre rendering of ops
      */
     preRenderOps()
     {
-        this._log.log("prerendering...");
+        this.#log.log("prerendering...");
 
         for (let i = 0; i < this.ops.length; i++)
         {
             if (this.ops[i].preRender)
             {
                 this.ops[i].preRender();
-                this._log.log("prerender " + this.ops[i].objName);
+                this.#log.log("prerender " + this.ops[i].objName);
             }
         }
     }
@@ -5908,6 +5770,8 @@ class Patch extends Events
 
     printTriggerStack()
     {
+
+        /* minimalcore:start */
         if (this._triggerStack.length == 0)
         {
             // console.log("stack length", this._triggerStack.length); // eslint-disable-line
@@ -5925,6 +5789,7 @@ class Patch extends Events
 
         console.table(rows); // eslint-disable-line
         console.groupEnd(); // eslint-disable-line
+        /* minimalcore:end */
     }
 
     get containerElement()
@@ -6001,12 +5866,14 @@ class Patch extends Events
                             {
                                 links.splice(l, 1);
                             }
+
+                            /* minimalcore:start */
                             else
                             {
                                 if (options.fixLostLinks)
                                 {
                                     const op = Patch.getGui().corePatch().getOpById(links[l].objIn);
-                                    if (!op) console.log("op not found!");
+                                    if (!op) console.log("op not found!"); // eslint-disable-line
                                     else
                                     {
                                         const outerOp = Patch.getGui().patchView.getSubPatchOuterOp(op.uiAttribs.subPatch);
@@ -6020,6 +5887,8 @@ class Patch extends Events
                                     }
                                 }
                             }
+
+                            /* minimalcore:end */
                         }
                     }
                 }
@@ -6249,11 +6118,14 @@ class SwitchPort extends Port
             this.indexPort.setValue(intValue);
             this.set(values[intValue]);
 
+            /* minimalcore:start */
             if (this.op.patch.isEditorMode() && performance.now() - (this.lastTime || 0) > 100 && Patch.getGui() && Patch.getGui().patchView.isCurrentOp(this.op))
             {
                 Patch.getGui().opParams.show(this.op);
                 this.lastTime = performance.now();
             }
+
+            /* minimalcore:end */
         };
     }
 
@@ -6270,26 +6142,8 @@ class SwitchPort extends Port
     }
 }
 
-;// CONCATENATED MODULE: ./src/core/core_port_select.js
-
-
-class ValueSelectPort extends SwitchPort
-{
-    setUiAttribs(newAttribs)
-    {
-        // never unhide valuePort when indexPort is linked
-        if (this.indexPort.isLinked())
-        {
-            for (const p in newAttribs)
-            {
-                if (p == "greyout" && !newAttribs[p]) newAttribs[p] = "true";
-            }
-        }
-        super.setUiAttribs(newAttribs);
-    }
-}
-
 ;// CONCATENATED MODULE: ./src/core/core_port_multi.js
+
 
 
 
@@ -6299,6 +6153,7 @@ const MIN_NUM_PORTS = 2;
 class MultiPort extends Port
 {
 
+    /* minimalcore:start */
     /**
      * @param {import("./core_op.js").Op<any>} __parent
      * @param {string} name
@@ -6311,6 +6166,7 @@ class MultiPort extends Port
     {
         super(__parent, name, Port.TYPE_ARRAY, uiAttribs);
 
+        this._log = new Logger("multiport old");
         this.setUiAttribs({ "multiPort": true, "group": this.name, "order": -1 });
         this.ports = [];
         this.direction = dir;
@@ -6396,13 +6252,16 @@ class MultiPort extends Port
 
         this.countPorts = () =>
         {
+
             const gui = Patch.getGui();
+
             if (CABLES.UI && !gui.isRemoteClient && gui.patchView && gui.patchView.patchRenderer && gui.patchView.patchRenderer.isDraggingPort())
             {
                 clearTimeout(this.retryTo);
                 this.retryTo = setTimeout(this.countPorts.bind(this));
                 return;
             }
+
             this.retryTo = null;
 
             let redo = false;
@@ -6543,7 +6402,7 @@ class MultiPort extends Port
             const attrs = {};
             // if (type == CABLES.OP_PORT_TYPE_STRING) attrs.type = "string";
             attrs.type = type;
-            const po = new Port(this.op, name + "_" + this.ports.length, type, attrs);
+            const po = this.op.newPort(this.op, name + "_" + this.ports.length, type, attrs);
 
             po.direction = dir;
 
@@ -6616,6 +6475,8 @@ class MultiPort extends Port
         this.removeInvalidPorts();
         updateUi();
     }
+
+/* minimalcore:end */
 }
 
 ;// CONCATENATED MODULE: ./src/core/core_port_multi2.js
@@ -6623,7 +6484,6 @@ class MultiPort extends Port
 
 
 
-const core_port_multi2_MIN_NUM_PORTS = 2;
 
 class MultiPort2 extends Port
 {
@@ -6636,11 +6496,13 @@ class MultiPort2 extends Port
      * @param {import("./core_port.js").PortUiAttribs} uiAttribs
      * @param {import("./core_port.js").PortUiAttribs} [uiAttribsPorts]
      */
-    constructor(__parent, name, type, dir, uiAttribs, uiAttribsPorts)
+    constructor(__parent, name, type, dir, uiAttribs, uiAttribsPorts, minNumPorts = 1)
     {
         super(__parent, name, Port.TYPE_ARRAY, uiAttribs);
 
+        this._log = new Logger("multiport2");
         this.setUiAttribs({ "multiPort2": true, "multiPort": true, "group": this.name, "order": -1, "multiPortManual": true });
+        this.minNumPorts = minNumPorts;
 
         /** @type {Port[]} */
         this.ports = [];
@@ -6651,7 +6513,7 @@ class MultiPort2 extends Port
         {
             const arr = [];
 
-            let ll = 1;
+            let ll = 1;// do not include addport
 
             for (let i = 0; i < this.ports.length - ll; i++)
                 arr[i] = this.ports[i];
@@ -6661,15 +6523,12 @@ class MultiPort2 extends Port
 
         const updateUi = () =>
         {
-            let grey = !this.uiAttribs.multiPortManual;
-
-            if (this.direction == CONSTANTS.PORT.PORT_DIR_OUT)grey = false;
-
             for (let i = 0; i < this.ports.length; i++)
             {
                 let lp; // undefined to remove/not set it
                 let addPort = false;
                 let title;
+                let grey = false;
                 let o = {};
 
                 if (this.op.preservedPortTitles && this.op.preservedPortTitles[this.ports[i].name]) title = this.op.preservedPortTitles[this.ports[i].name];
@@ -6701,20 +6560,13 @@ class MultiPort2 extends Port
             for (let i = 0; i < this.ports.length; i++)
                 if (!this.ports[i]) this.ports.splice(i, 1);
 
-            // if (!this.uiAttribs.multiPortManual && this.ports.length > MIN_NUM_PORTS)
-            // {
-            //     for (let i = this.ports.length - 1; i > 1; i--)
-            //     {
-            //         if (!this.ports[i].isLinked()) this.uiAttribs.multiPortNum = i;
-            //         else break;
-            //     }
-            // }
-
             updateArray();
         };
 
         this.countPorts = () =>
         {
+
+            /* minimalcore:start */
             const gui = Patch.getGui();
             if (CABLES.UI && !gui.isRemoteClient && gui.patchView && gui.patchView.patchRenderer && gui.patchView.patchRenderer.isDraggingPort())
             {
@@ -6722,6 +6574,8 @@ class MultiPort2 extends Port
                 this.retryTo = setTimeout(this.countPorts.bind(this));
                 return;
             }
+
+            /* minimalcore:end */
             this.retryTo = null;
 
             let redo = false;
@@ -6749,59 +6603,15 @@ class MultiPort2 extends Port
                 }
             }
 
-            if (this.ports.length > 1 && this.ports[this.ports.length - 1].uiAttribs.addPort && this.ports[this.ports.length - 1].isLinked())
+            const idxLastPort = this.ports.length - 1;
+
+            if (this.ports.length >= 1 && this.ports[idxLastPort].uiAttribs.addPort && this.ports[idxLastPort].isLinked())
             {
-                this.ports[this.ports.length - 1].uiAttribs.addPort = false;
-                this.setUiAttribs({ "multiPortNum": this.uiAttribs.multiPortNum + 1 });
+                this.newPort();
+                this.setUiAttribs({ "multiPortNum": this.ports.length });
             }
 
-            // if (!this.uiAttribs.multiPortManual)
-            // {
-            //     let foundHole = true;
-            //     while (foundHole)
-            //     {
-            //         foundHole = false;
-
-            //         for (let i = this.ports.length - 1; i > 1; i--)
-            //         {
-            //             if (this.ports[i] && this.ports[i].links.length > 0 && this.ports[i - 1].links.length == 0)
-            //             {
-            //                 // found hole
-            //                 const otherPort = this.ports[i].links[0].getOtherPort(this.ports[i]);
-            //                 this.ports[i].links[0].remove();
-
-            //                 const po = this.ports[i - 1];
-
-            //                 if (po && this.ports[i])
-            //                 {
-            //                     this.op.patch.link(this.op, po.name, otherPort.op, otherPort.name);
-            //                     foundHole = true;
-            //                     redo = true;
-            //                     break;
-            //                 }
-            //             }
-            //         }
-            //     }
-
-            // }
-
-            // if (!this.uiAttribs.multiPortManual) // if auto
-            // {
-            //     while (this.ports.length > MIN_NUM_PORTS && !this.ports[this.ports.length - 1].isLinked() && !this.ports[this.ports.length - 2].isLinked())
-            //     {
-            //         let i = this.ports.length - 1;
-            //         if (!this.ports[i].isLinked() && this.ports[i - 1] && !this.ports[i - 1].isLinked())
-            //         {
-            //             this.ports[i].setUiAttribs({ "removed": true });
-            //             this.ports[i].remove();
-            //             this.ports.splice(i, 1);
-            //         }
-            //     }
-            // }
-
             this.removeInvalidPorts();
-
-            if (!this.uiAttribs.multiPortManual && this.ports.length > 0 && this.ports[this.ports.length - 1].isLinked()) this.newPort();
 
             updateArray();
             updateUi();
@@ -6844,19 +6654,20 @@ class MultiPort2 extends Port
                 po.multiLinkRemoveListener = po.on("onLinkRemoved", () =>
                 {
                     updateUi();
+                    this.countPorts();
                     this.emitEvent("onLinkChanged");
                 });
             }
         };
 
-        this.newPort = () =>
+        this.newPort = (reason) =>
         {
 
             /** @type {import("./core_port.js").PortUiAttribs} */
             const attrs = {};
             // if (type == CABLES.OP_PORT_TYPE_STRING) attrs.type = "string";
             attrs.type = type;
-            const po = new Port(this.op, name + "_" + this.ports.length, type, attrs);
+            const po = this.op.newPort(this.op, name + "_" + this.ports.length, type, attrs);
 
             po.direction = dir;
 
@@ -6872,7 +6683,7 @@ class MultiPort2 extends Port
             updateUi();
             updateArray();
             this.emitEvent("onLinkChanged");
-            // console.log("this.op.preservedPortTitles", this.op.preservedPortTitles, this.op.preservedPortTitles[po.name], po.name);
+
             if (this.op.preservedPortTitles && this.op.preservedPortTitles[po.name]) po.setUiAttribs({ "title": this.op.preservedPortTitles[po.name] });
 
             return po;
@@ -6880,29 +6691,29 @@ class MultiPort2 extends Port
 
         this.initPorts = () =>
         {
-            for (let i = 0; i < core_port_multi2_MIN_NUM_PORTS; i++) this.newPort();
+            while (this.ports.length < this.minNumPorts) this.newPort("init" + this.minNumPorts);
             updateArray();
             updateUi();
         };
 
         this.checkNum = () =>
         {
-            this.uiAttribs.multiPortNum = Math.max(core_port_multi2_MIN_NUM_PORTS, this.uiAttribs.multiPortNum);
+            this.uiAttribs.multiPortNum ||= this.minNumPorts;
+            this.uiAttribs.multiPortNum = Math.max(this.minNumPorts, this.uiAttribs.multiPortNum);
 
-            while (this.ports.length < this.uiAttribs.multiPortNum) this.newPort();
+            while (this.ports.length < this.uiAttribs.multiPortNum) this.newPort("checknum");
             while (this.ports.length > this.uiAttribs.multiPortNum) if (this.ports[this.ports.length - 1]) this.ports.pop().remove();
 
             this.removeInvalidPorts();
             if (this.ports.length > 1 && this.ports[this.ports.length - 1].uiAttribs.addPort && this.ports[this.ports.length - 1].isLinked())
             {
                 this.ports[this.ports.length - 1].removeLinks();
-                console.log("found invalid");
             }
         };
 
         this.incDec = (incDir) =>
         {
-            this.uiAttribs.multiPortNum = this.uiAttribs.multiPortNum || core_port_multi2_MIN_NUM_PORTS;
+            this.uiAttribs.multiPortNum = this.uiAttribs.multiPortNum || this.minNumPorts;
             this.setUiAttribs({ "multiPortNum": this.uiAttribs.multiPortNum + incDir });
             this.checkNum();
 
@@ -6918,7 +6729,6 @@ class MultiPort2 extends Port
 }
 
 ;// CONCATENATED MODULE: ./src/core/core_op.js
-
 
 
 
@@ -6988,7 +6798,7 @@ class Op extends Events
     static UI_ERRORLEVEL_NOTWORKING = 3;
 
     #objName = "";
-    _log = new Logger("core_op");
+    #log = new Logger("core_op");
     //    #name = "";
     #shortOpName = "";
 
@@ -7017,11 +6827,16 @@ class Op extends Events
     preservedPortValues = {};
     preservedPortLinks = {};
 
+    /* minimalcore:start */
     linkTimeRules = {
         "needsLinkedToWork": [],
         "needsStringToWork": [],
         "needsParentOp": null
     };
+
+    inValueSlider = this.inFloatSlider;
+
+    /* minimalcore:end */
 
     shouldWork = {};
     hasUiErrors = 0;
@@ -7042,7 +6857,6 @@ class Op extends Events
     {
         super();
 
-        // this.#name = _objName;
         this.opId = _id;
         this.#objName = _objName;
         this.patch = _patch;
@@ -7082,15 +6896,21 @@ class Op extends Events
          */
     }
 
+    /* minimalcore:start */
     isInBlueprint2() // will be overwritten in ui
     {
         return false;
     }
 
+    /* minimalcore:end */
+
+    /* minimalcore:start */
     getSubPatch()// will be overwritten in ui
     {
         return 0;
     }
+
+    /* minimalcore:end */
 
     get name()
     {
@@ -7108,7 +6928,7 @@ class Op extends Events
     set _objName(on)
     {
         this.#objName = on;
-        this._log = new Logger("op " + on);
+        this.#log = new Logger("op " + on);
     }
 
     get objName()
@@ -7127,6 +6947,7 @@ class Op extends Events
      * @param {String} _name - module name
      * @returns {Object}
      */
+    /* minimalcore:start */
     require(_name)
     {
         if (CABLES.platform && CABLES.StandaloneElectron && !CABLES.platform.frontendOptions.isElectron)
@@ -7135,6 +6956,9 @@ class Op extends Events
         return null;
     }
 
+    /* minimalcore:end */
+
+    /* minimalcore:start */
     checkMainloopExists()
     {
         if (!CABLES.UI) return;
@@ -7142,15 +6966,12 @@ class Op extends Events
         else this.setUiError("nomainloop", null);
     }
 
+    /* minimalcore:end */
+
     /** @returns {string} */
     getTitle()
     {
         if (!this.uiAttribs) return "nouiattribs" + this.shortName;
-
-        /*
-         * if ((this.uiAttribs.title === undefined || this.uiAttribs.title === "") && this.objName.indexOf("Ops.Ui.") == -1)
-         *     this.uiAttribs.title = this._shortOpName;
-         */
 
         return this.uiAttribs.title || this.#shortOpName;
     }
@@ -7161,16 +6982,10 @@ class Op extends Events
     setTitle(title)
     {
 
-        /*
-         * this._log.log("settitle", title);
-         * this._log.log(
-         *     (new Error()).stack
-         * );
-         */
-
         if (title != this.getTitle()) this._setUiAttrib({ "title": title });
     }
 
+    /* minimalcore:start */
     /**
      * @param {Object} newAttribs
      */
@@ -7188,6 +7003,8 @@ class Op extends Events
 
         if (changed) this.emitEvent("onStorageChange", newAttribs);
     }
+
+    /* minimalcore:end */
 
     isSubPatchOp()
     {
@@ -7220,6 +7037,7 @@ class Op extends Events
         this._setUiAttrib(a);
     }
 
+    /* minimalcore:start */
     /**
      * @deprecated
      * @param {OpUiAttribs} a
@@ -7230,14 +7048,133 @@ class Op extends Events
     }
 
     /**
+     * @deprecated
+     * @param {string} name
+     * @param {any[]} values
+     * @param {string} v
+     * @param {boolean} noindex
+     */
+    inValueSelect(name, values, v, noindex)
+    {
+        return this.inDropDown(name, values, v, noindex);
+    }
+
+    /**
+     *
+     * @deprecated
+     * @param {string} name
+     * @param {number} v
+     */
+    inValueInt(name, v)
+    {
+        return this.inInt(name, v);
+    }
+
+    /**
+     * @deprecated
+     * @param {string} name
+     * @param {string} v
+     */
+    outFunction(name, v)
+    {
+        return this.outTrigger(name, v);
+    }
+
+    /**
+     * @deprecated
+     * @param {string} name
+     * @param {number} v
+     */
+    outValue(name, v)
+    {
+        return this.outNumber(name, v);
+    }
+
+    /**
+     * @deprecated
+     * @param {string} name
+     * @param {boolean} v
+     */
+    outValueBool(name, v)
+    {
+        return this.outBool(name, v);
+    }
+
+    /**
+     * deprecated create output boolean port
+     * @deprecated
+     * @param {String} name
+     * @param {boolean} v default value
+     * @return {Port} created port
+     */
+    outBool(name, v)
+    {
+        // old: use outBoolNum
+        const p = this.addOutPort(
+            this.newPort(this, name, Port.TYPE_VALUE, {
+                "display": "bool"
+            })
+        );
+        if (v !== undefined) p.set(v);
+        else p.set(0);
+        return p;
+    }
+
+    /**
+     * @deprecated
+     * @param {string} name
+     * @param {string} v
+     */
+    outValueString(name, v)
+    {
+        const p = this.addOutPort(
+            this.newPort(this, name, Port.TYPE_VALUE, {
+                "type": "string"
+            })
+        );
+        if (v !== undefined) p.set(v);
+        return p;
+    }
+
+    /**
+     * @deprecated
+     * @param {string} name
+     * @param {any} filter
+     * @param {any} options
+     * @param {any} v
+     */
+    inDynamic(name, filter, options, v)
+    {
+        const p = this.newPort(this, name, Port.TYPE_DYNAMIC, options);
+
+        p.shouldLink = () =>
+        {
+            if (filter && Array.isArray(filter)) return false; // types do not match
+            return true; // no filter set
+        };
+
+        this.addInPort(p);
+        if (v !== undefined)
+        {
+            p.set(v);
+            p.defaultValue = v;
+        }
+        return p;
+    }
+
+    /* minimalcore:end */
+
+    /**
      * @TODO  move to ui extend class.....
      * @param {OpUiAttribs} newAttribs
      */
     _setUiAttrib(newAttribs)
     {
+
+        /* minimalcore:start */
         if (!newAttribs) return;
 
-        if (typeof newAttribs != "object") this._log.error("op.uiAttrib attribs are not of type object");
+        if (typeof newAttribs != "object") this.#log.error("op.uiAttrib attribs are not of type object");
         if (!this.uiAttribs) this.uiAttribs = {};
 
         let changed = false;
@@ -7269,6 +7206,7 @@ class Op extends Events
             this.uiAttribs[p] = newAttribs[p];
         }
 
+        if (this.uiAttribs.hasOwnProperty("vizLayerMaxZoom") && this.uiAttribs.vizLayerMaxZoom == false) delete this.uiAttribs.vizLayerMaxZoom;
         if (this.uiAttribs.hasOwnProperty("highlighted") && this.uiAttribs.highlighted == false) delete this.uiAttribs.highlighted;
         if (this.uiAttribs.hasOwnProperty("highlightedMore") && this.uiAttribs.highlightedMore == false) delete this.uiAttribs.highlightedMore;
         if (this.uiAttribs.hasOwnProperty("selected") && this.uiAttribs.selected == false) delete this.uiAttribs.selected;
@@ -7281,6 +7219,9 @@ class Op extends Events
         }
 
         if (emitMove) this.emitEvent("move");
+
+        /* minimalcore:end */
+
     }
 
     getName()
@@ -7294,7 +7235,7 @@ class Op extends Events
     addOutPort(p)
     {
         p.direction = CONSTANTS.PORT.PORT_DIR_OUT;
-        if (p.op != this)console.error("port op is not this...");
+        if (p.op != this) this.#log.error("port op is not this...");
         // p._op = this; // remove if above does never happen....
 
         this.portsOut.push(p);
@@ -7302,6 +7243,7 @@ class Op extends Events
         return p;
     }
 
+    /* minimalcore:start */
     hasDynamicPort()
     {
         let i = 0;
@@ -7318,6 +7260,8 @@ class Op extends Events
 
         return false;
     }
+
+    /* minimalcore:end */
 
     /**
      * @param {any | Port | MultiPort} p
@@ -7361,7 +7305,7 @@ class Op extends Events
      */
     inTrigger(name, v)
     {
-        const p = this.addInPort(new Port(this, name, Port.TYPE_FUNCTION));
+        const p = this.addInPort(this.newPort(this, name, Port.TYPE_FUNCTION));
         if (v !== undefined) p.set(v);
         return p;
     }
@@ -7375,7 +7319,7 @@ class Op extends Events
     inTriggerButton(name, v)
     {
         const p = this.addInPort(
-            new Port(this, name, Port.TYPE_FUNCTION, {
+            this.newPort(this, name, Port.TYPE_FUNCTION, {
                 "display": "button"
             })
         );
@@ -7390,7 +7334,7 @@ class Op extends Events
     inUiTriggerButtons(name, v)
     {
         const p = this.addInPort(
-            new Port(this, name, Port.TYPE_FUNCTION, {
+            this.newPort(this, name, Port.TYPE_FUNCTION, {
                 "display": "buttons"
             })
         );
@@ -7398,6 +7342,7 @@ class Op extends Events
         return p;
     }
 
+    /* minimalcore:start */
     /**
      * @deprecated
      * @param {string} name
@@ -7419,21 +7364,6 @@ class Op extends Events
     }
 
     /**
-     * create a number value input port
-     * @param {String} name
-     * @param {Number} v
-     * @return {Port} created port
-     */
-    inFloat(name, v)
-    {
-        const p = this.addInPort(new Port(this, name, Port.TYPE_VALUE));
-
-        p.setInitialValue(v);
-
-        return p;
-    }
-
-    /**
      * @deprecated
      * @param {string} name
      * @param {number | boolean} v
@@ -7441,6 +7371,23 @@ class Op extends Events
     inValueBool(name, v)
     {
         return this.inBool(name, v);
+    }
+
+    /* minimalcore:end */
+
+    /**
+     * create a number value input port
+     * @param {String} name
+     * @param {Number} v
+     * @return {Port} created port
+     */
+    inFloat(name, v)
+    {
+        const p = this.addInPort(this.newPort(this, name, Port.TYPE_VALUE));
+
+        p.setInitialValue(v);
+
+        return p;
     }
 
     /**
@@ -7452,7 +7399,7 @@ class Op extends Events
     inBool(name, v)
     {
         const p = this.addInPort(
-            new Port(this, name, Port.TYPE_NUMBER, {
+            this.newPort(this, name, Port.TYPE_NUMBER, {
                 "display": "bool"
             })
         );
@@ -7491,7 +7438,7 @@ class Op extends Events
      * @param {number} type
      * @param {import("./core_port.js").PortUiAttribs} uiAttrs
      */
-    inMultiPort2(name, type, uiAttrs)
+    inMultiPort2(name, type, uiAttrs, minNum = 2)
     {
         const attrs =
             {
@@ -7499,7 +7446,7 @@ class Op extends Events
                 "hidePort": true
             };
 
-        const p = new MultiPort2(this, name, type, Port.DIR_IN, attrs, uiAttrs);
+        const p = new MultiPort2(this, name, type, Port.DIR_IN, attrs, uiAttrs, minNum);
         p.ignoreValueSerialize = true;
 
         this.addInPort(p);
@@ -7537,7 +7484,7 @@ class Op extends Events
      * @param {string} name
      * @param {number} type
      */
-    outMultiPort2(name, type, uiAttribsPort = {})
+    outMultiPort2(name, type, uiAttribsPort = {}, minNum = 2)
     {
         const p = new MultiPort2(
             this,
@@ -7548,7 +7495,8 @@ class Op extends Events
                 "display": "multiport",
                 "hidePort": true
             },
-            uiAttribsPort
+            uiAttribsPort,
+            minNum
         );
         p.ignoreValueSerialize = true;
 
@@ -7565,7 +7513,7 @@ class Op extends Events
     inValueString(name, v)
     {
         const p = this.addInPort(
-            new Port(this, name, Port.TYPE_VALUE, {
+            this.newPort(this, name, Port.TYPE_VALUE, {
                 "type": "string"
             })
         );
@@ -7584,7 +7532,7 @@ class Op extends Events
     inString(name, v)
     {
         const p = this.addInPort(
-            new Port(this, name, Port.TYPE_STRING, {
+            this.newPort(this, name, Port.TYPE_STRING, {
                 "type": "string"
             })
         );
@@ -7604,7 +7552,7 @@ class Op extends Events
     // inValueText(name, v)
     // {
     //     const p = this.addInPort(
-    //         new Port(this, name, Port.TYPE_VALUE, {
+    //         this.newPort(this, name, Port.TYPE_VALUE, {
     //             "type": "string",
     //             "display": "text"
     //         })
@@ -7630,7 +7578,7 @@ class Op extends Events
     inTextarea(name, v)
     {
         const p = this.addInPort(
-            new Port(this, name, Port.TYPE_STRING, {
+            this.newPort(this, name, Port.TYPE_STRING, {
                 "type": "string",
                 "display": "text"
             })
@@ -7655,7 +7603,7 @@ class Op extends Events
     inStringEditor(name, v, syntax, hideFormatButton = true)
     {
         const p = this.addInPort(
-            new Port(this, name, Port.TYPE_STRING, {
+            this.newPort(this, name, Port.TYPE_STRING, {
                 "type": "string",
                 "display": "editor",
                 "editShortcut": true,
@@ -7681,7 +7629,7 @@ class Op extends Events
     inValueEditor(name, v, syntax, hideFormatButton = true)
     {
         const p = this.addInPort(
-            new Port(this, name, Port.TYPE_NUMBER, {
+            this.newPort(this, name, Port.TYPE_NUMBER, {
                 "type": "string",
                 "display": "editor",
                 "editorSyntax": syntax,
@@ -7698,18 +7646,6 @@ class Op extends Events
     }
 
     /**
-     * @deprecated
-     * @param {string} name
-     * @param {any[]} values
-     * @param {string} v
-     * @param {boolean} noindex
-     */
-    inValueSelect(name, values, v, noindex)
-    {
-        return this.inDropDown(name, values, v, noindex);
-    }
-
-    /**
      * create a string select box
      * @param {String} name
      * @param {Array} values
@@ -7722,7 +7658,7 @@ class Op extends Events
         let p = null;
         if (!noindex)
         {
-            const indexPort = new Port(this, name + " index", Port.TYPE_NUMBER, {
+            const indexPort = this.newPort(this, name + " index", Port.TYPE_NUMBER, {
                 "increment": "integer",
                 "hideParam": true
             });
@@ -7730,7 +7666,7 @@ class Op extends Events
 
             if (values) for (let i = 0; i < values.length; i++) values[i] = String(values[i]);
 
-            const valuePort = new ValueSelectPort(
+            const valuePort = new SwitchPort(
                 this,
                 name,
                 Port.TYPE_NUMBER,
@@ -7754,10 +7690,11 @@ class Op extends Events
                 }
             });
 
-            indexPort.onLinkChanged = () =>
+            indexPort.on(Port.EVENT_LINK_CHANGED, () =>
             {
                 valuePort.setUiAttribs({ "greyout": indexPort.isLinked() });
-            };
+                valuePort.forceChange();
+            });
 
             p = this.addInPort(valuePort);
 
@@ -7772,7 +7709,7 @@ class Op extends Events
         }
         else
         {
-            const valuePort = new Port(this, name, Port.TYPE_VALUE, {
+            const valuePort = this.newPort(this, name, Port.TYPE_VALUE, {
                 "display": "dropdown",
                 "hidePort": true,
                 "type": "string",
@@ -7799,7 +7736,7 @@ class Op extends Events
         if (!noindex)
         {
             if (!v)v = values[0];
-            const indexPort = new Port(this, name + " index", Port.TYPE_VALUE, {
+            const indexPort = this.newPort(this, name + " index", Port.TYPE_VALUE, {
                 "increment": "integer",
                 "values": values,
                 "hideParam": true
@@ -7831,12 +7768,13 @@ class Op extends Events
                     if (idx > -1) thePort.indexPort.set(idx);
                 }
             });
+            p = this.addInPort(switchPort);
 
-            indexPort.onLinkChanged = function ()
+            indexPort.on(Port.EVENT_LINK_CHANGED, () =>
             {
                 switchPort.setUiAttribs({ "greyout": indexPort.isLinked() });
-            };
-            p = this.addInPort(switchPort);
+                switchPort.forceChange();
+            });
 
             if (v !== undefined)
             {
@@ -7849,7 +7787,7 @@ class Op extends Events
         }
         else
         {
-            const switchPort = new Port(this, name, Port.TYPE_STRING, {
+            const switchPort = this.newPort(this, name, Port.TYPE_STRING, {
                 "display": "switch",
                 "hidePort": true,
                 "type": "string",
@@ -7862,17 +7800,6 @@ class Op extends Events
     }
 
     /**
-     *
-     * @deprecated
-     * @param {string} name
-     * @param {number} v
-     */
-    inValueInt(name, v)
-    {
-        return this.inInt(name, v);
-    }
-
-    /**
      * create a integer input port
      * @param {String} name
      * @param {number} v default value
@@ -7881,7 +7808,7 @@ class Op extends Events
     inInt(name, v)
     {
         // old
-        const p = this.addInPort(new Port(this, name, Port.TYPE_VALUE, { "increment": "integer" }));
+        const p = this.addInPort(this.newPort(this, name, Port.TYPE_VALUE, { "increment": "integer" }));
         if (v !== undefined)
         {
             p.set(v);
@@ -7900,7 +7827,7 @@ class Op extends Events
     inFile(name, filter, v)
     {
         const p = this.addInPort(
-            new Port(this, name, Port.TYPE_VALUE, {
+            this.newPort(this, name, Port.TYPE_VALUE, {
                 "display": "file",
                 "type": "string",
                 "filter": filter
@@ -7924,7 +7851,7 @@ class Op extends Events
     inUrl(name, filter, v)
     {
         const p = this.addInPort(
-            new Port(this, name, Port.TYPE_STRING, {
+            this.newPort(this, name, Port.TYPE_STRING, {
                 "display": "file",
                 "type": "string",
                 "filter": filter
@@ -7947,7 +7874,7 @@ class Op extends Events
     inTexture(name, v)
     {
         const p = this.addInPort(
-            new Port(this, name, Port.TYPE_OBJECT, {
+            this.newPort(this, name, Port.TYPE_OBJECT, {
                 "display": "texture",
                 "objType": "texture",
                 "preview": true
@@ -7967,7 +7894,7 @@ class Op extends Events
      */
     inObject(name, v, objType)
     {
-        const p = this.addInPort(new Port(this, name, Port.TYPE_OBJECT, { "objType": objType }));
+        const p = this.addInPort(this.newPort(this, name, Port.TYPE_OBJECT, { "objType": objType }));
         p.ignoreValueSerialize = true;
 
         if (v !== undefined) p.set(v);
@@ -7981,7 +7908,7 @@ class Op extends Events
     inGradient(name, v)
     {
         const p = this.addInPort(
-            new Port(this, name, Port.TYPE_VALUE, {
+            this.newPort(this, name, Port.TYPE_VALUE, {
                 "display": "gradient"
                 // "hidePort": true
             })
@@ -8021,23 +7948,11 @@ class Op extends Events
         // @ts-ignore
         if (!_stride && CABLES.isNumeric(v))stride = v;
 
-        const p = this.addInPort(new Port(this, name, Port.TYPE_ARRAY, { "stride": stride }));
+        const p = this.addInPort(this.newPort(this, name, Port.TYPE_ARRAY, { "stride": stride }));
 
         if (v !== undefined && (Array.isArray(v) || v == null)) p.set(v);
 
         return p;
-    }
-
-    /**
-     * @deprecated
-     * @param {string} name
-     * @param {number} v
-     * @param {number} min
-     * @param {number} max
-     */
-    inValueSlider(name, v, min, max)
-    {
-        return this.inFloatSlider(name, v, min, max);
     }
 
     /**
@@ -8058,23 +7973,13 @@ class Op extends Events
             uiattribs.max = max;
         }
 
-        const p = this.addInPort(new Port(this, name, Port.TYPE_VALUE, uiattribs));
+        const p = this.addInPort(this.newPort(this, name, Port.TYPE_VALUE, uiattribs));
         if (v !== undefined)
         {
             p.set(v);
             p.defaultValue = v;
         }
         return p;
-    }
-
-    /**
-     * @deprecated
-     * @param {string} name
-     * @param {string} v
-     */
-    outFunction(name, v)
-    {
-        return this.outTrigger(name, v);
     }
 
     /**
@@ -8086,19 +7991,9 @@ class Op extends Events
     outTrigger(name, v)
     {
         // old
-        const p = this.addOutPort(new Port(this, name, Port.TYPE_FUNCTION));
+        const p = this.addOutPort(this.newPort(this, name, Port.TYPE_FUNCTION));
         if (v !== undefined) p.set(v);
         return p;
-    }
-
-    /**
-     * @deprecated
-     * @param {string} name
-     * @param {number} v
-     */
-    outValue(name, v)
-    {
-        return this.outNumber(name, v);
     }
 
     /**
@@ -8109,38 +8004,8 @@ class Op extends Events
      */
     outNumber(name, v)
     {
-        const p = this.addOutPort(new Port(this, name, Port.TYPE_VALUE));
+        const p = this.addOutPort(this.newPort(this, name, Port.TYPE_VALUE));
         if (v !== undefined) p.set(v);
-        return p;
-    }
-
-    /**
-     * @deprecated
-     * @param {string} name
-     * @param {boolean} v
-     */
-    outValueBool(name, v)
-    {
-        return this.outBool(name, v);
-    }
-
-    /**
-     * deprecated create output boolean port
-     * @deprecated
-     * @param {String} name
-     * @param {boolean} v default value
-     * @return {Port} created port
-     */
-    outBool(name, v)
-    {
-        // old: use outBoolNum
-        const p = this.addOutPort(
-            new Port(this, name, Port.TYPE_VALUE, {
-                "display": "bool"
-            })
-        );
-        if (v !== undefined) p.set(v);
-        else p.set(0);
         return p;
     }
 
@@ -8153,7 +8018,7 @@ class Op extends Events
     outBoolNum(name, v)
     {
         const p = this.addOutPort(
-            new Port(this, name, Port.TYPE_VALUE, {
+            this.newPort(this, name, Port.TYPE_VALUE, {
                 "display": "boolnum"
             })
         );
@@ -8169,22 +8034,6 @@ class Op extends Events
     }
 
     /**
-     * @deprecated
-     * @param {string} name
-     * @param {string} v
-     */
-    outValueString(name, v)
-    {
-        const p = this.addOutPort(
-            new Port(this, name, Port.TYPE_VALUE, {
-                "type": "string"
-            })
-        );
-        if (v !== undefined) p.set(v);
-        return p;
-    }
-
-    /**
      * create output string port
      * @param {string} name
      * @param {String} v
@@ -8193,7 +8042,7 @@ class Op extends Events
     outString(name, v)
     {
         const p = this.addOutPort(
-            new Port(this, name, Port.TYPE_STRING, {
+            this.newPort(this, name, Port.TYPE_STRING, {
                 "type": "string"
             })
         );
@@ -8211,7 +8060,7 @@ class Op extends Events
      */
     outObject(name, v, objType)
     {
-        const p = this.addOutPort(new Port(this, name, Port.TYPE_OBJECT, { "objType": objType || null }));
+        const p = this.addOutPort(this.newPort(this, name, Port.TYPE_OBJECT, { "objType": objType || null }));
         p.set(v || null);
         p.ignoreValueSerialize = true;
         return p;
@@ -8227,7 +8076,7 @@ class Op extends Events
     outArray(name, v, stride)
     {
         if (!stride && CABLES.isNumeric(v))stride = v;
-        const p = this.addOutPort(new Port(this, name, Port.TYPE_ARRAY, { "stride": stride }));
+        const p = this.addOutPort(this.newPort(this, name, Port.TYPE_ARRAY, { "stride": stride }));
         if (v !== undefined && (Array.isArray(v) || v == null)) p.set(v);
 
         p.ignoreValueSerialize = true;
@@ -8243,34 +8092,8 @@ class Op extends Events
      */
     outTexture(name, v)
     {
-        console.log("outtexture not overwritte.,..");
+        // overwrite in gui...
         return null;
-    }
-
-    /**
-     * @deprecated
-     * @param {string} name
-     * @param {any} filter
-     * @param {any} options
-     * @param {any} v
-     */
-    inDynamic(name, filter, options, v)
-    {
-        const p = new Port(this, name, Port.TYPE_DYNAMIC, options);
-
-        p.shouldLink = () =>
-        {
-            if (filter && Array.isArray(filter)) return false; // types do not match
-            return true; // no filter set
-        };
-
-        this.addInPort(p);
-        if (v !== undefined)
-        {
-            p.set(v);
-            p.defaultValue = v;
-        }
-        return p;
     }
 
     removeLinks()
@@ -8282,15 +8105,17 @@ class Op extends Events
     // @TODO should be move to extend...
     getSerialized()
     {
+
+        /* minimalcore:start */
         const opObj = {};
 
         if (this.opId) opObj.opId = this.opId;
         if (this.patch.storeObjNames) opObj.objName = this.objName;
 
         opObj.id = this.id;
-        opObj.uiAttribs = JSON.parse(JSON.stringify(this.uiAttribs)) || {};
+        opObj.uiAttribs = structuredClone(this.uiAttribs) || {};
 
-        if (this.storage && Object.keys(this.storage).length > 0) opObj.storage = JSON.parse(JSON.stringify(this.storage));
+        if (this.storage && Object.keys(this.storage).length > 0) opObj.storage = structuredClone(this.storage);
         if (this.uiAttribs.hasOwnProperty("working") && this.uiAttribs.working == true) delete this.uiAttribs.working;
         if (opObj.uiAttribs.hasOwnProperty("uierrors")) delete opObj.uiAttribs.uierrors;
         if (opObj.uiAttribs.hasOwnProperty("highlighted")) delete opObj.uiAttribs.highlighted;
@@ -8324,6 +8149,8 @@ class Op extends Events
         cleanJson(opObj);
 
         return opObj;
+
+        /* minimalcore:end */
     }
 
     /**
@@ -8403,20 +8230,32 @@ class Op extends Events
 
     log()
     {
-        this._log.log(...arguments);
+        this.#log.log(...arguments);
     }
+
+    logError()
+    {
+        this.#log.error(...arguments);
+    }
+
+    logWarn()
+    {
+        this.#log.warn(...arguments);
+    }
+
+    logVerbose()
+    {
+        this.#log.verbose(...arguments);
+    }
+
+    /* minimalcore:start */
 
     /**
      * @deprecated
      */
     error()
     {
-        this._log.error(...arguments);
-    }
-
-    logError()
-    {
-        this._log.error(...arguments);
+        this.#log.error(...arguments);
     }
 
     /**
@@ -8424,12 +8263,7 @@ class Op extends Events
      */
     warn()
     {
-        this._log.warn(...arguments);
-    }
-
-    logWarn()
-    {
-        this._log.warn(...arguments);
+        this.#log.warn(...arguments);
     }
 
     /**
@@ -8437,26 +8271,15 @@ class Op extends Events
      */
     verbose()
     {
-        this._log.verbose(...arguments);
+        this.#log.verbose(...arguments);
     }
 
-    logVerbose()
-    {
-        this._log.verbose(...arguments);
-    }
-
-    profile()
-    {
-        for (let ipi = 0; ipi < this.portsIn.length; ipi++)
-        {
-            this.portsIn[ipi]._onTriggered = this.portsIn[ipi]._onTriggeredProfiling;
-            this.portsIn[ipi].set = this.portsIn[ipi]._onSetProfiling;
-        }
-    }
-
+    /* minimalcore:end */
     // todo: check instancing stuff?
     cleanUp()
     {
+
+        /* minimalcore:start */
         if (this._instances)
         {
             for (let i = 0; i < this._instances.length; i++)
@@ -8469,6 +8292,8 @@ class Op extends Events
             this.portsIn[i].setAnimated(false);
 
         if (this.onAnimFrame) this.patch.removeOnAnimFrame(this);
+
+    /* minimalcore:end */
     }
 
     // todo: check instancing stuff?
@@ -8604,7 +8429,11 @@ class Op extends Events
      */
     hasUiError(id)
     {
+
+        /* minimalcore:start */
         return this.uiErrors.hasOwnProperty(id) && this.uiErrors[id];
+
+        /* minimalcore:end */
     }
 
     /**
@@ -8637,12 +8466,16 @@ class Op extends Events
      */
     setPortGroup(name, ports)
     {
+
+        /* minimalcore:start */
         for (let i = 0; i < ports.length; i++)
         {
             if (ports[i])
                 if (ports[i].setUiAttribs) ports[i].setUiAttribs({ "group": name });
-                else this._log.error("setPortGroup: invalid port!");
+                else this.#log.error("setPortGroup: invalid port!");
         }
+
+        /* minimalcore:end */
     }
 
     /**
@@ -8654,9 +8487,13 @@ class Op extends Events
      */
     setUiAxisPorts(px, py, pz)
     {
+
+        /* minimalcore:start */
         if (px) px.setUiAttribs({ "axis": "X" });
         if (py) py.setUiAttribs({ "axis": "Y" });
         if (pz) pz.setUiAttribs({ "axis": "Z" });
+
+        /* minimalcore:end */
     }
 
     /**
@@ -8694,7 +8531,11 @@ class Op extends Events
      */
     toWorkNeedsParent(parentOpName)
     {
+
+        /* minimalcore:start */
         this.linkTimeRules.needsParentOp = parentOpName;
+
+        /* minimalcore:end */
     }
 
     /**
@@ -8704,16 +8545,24 @@ class Op extends Events
      */
     toWorkShouldNotBeChild(parentOpName, type)
     {
+
+        /* minimalcore:start */
         if (!this.patch.isEditorMode()) return;
         this.linkTimeRules.forbiddenParent = parentOpName;
         if (type != undefined) this.linkTimeRules.forbiddenParentType = type;
+
+        /* minimalcore:end */
     }
 
     toWorkPortsNeedsString()
     {
+
+        /* minimalcore:start */
         if (!this.patch.isEditorMode()) return;
         for (let i = 0; i < arguments.length; i++)
             if (this.linkTimeRules.needsStringToWork.indexOf(arguments[i]) == -1) this.linkTimeRules.needsStringToWork.push(arguments[i]);
+
+        /* minimalcore:end */
     }
 
     /**
@@ -8722,16 +8571,24 @@ class Op extends Events
      */
     toWorkPortsNeedToBeLinked()
     {
+
+        /* minimalcore:start */
         if (!this.patch.isEditorMode()) return;
         for (let i = 0; i < arguments.length; i++)
             if (this.linkTimeRules.needsLinkedToWork.indexOf(arguments[i]) == -1) this.linkTimeRules.needsLinkedToWork.push(arguments[i]);
+
+        /* minimalcore:end */
     }
 
     toWorkPortsNeedToBeLinkedReset()
     {
+
+        /* minimalcore:start */
         if (!this.patch.isEditorMode()) return;
         this.linkTimeRules.needsLinkedToWork.length = 0;
         if (this.checkLinkTimeWarnings) this.checkLinkTimeWarnings();
+
+        /* minimalcore:end */
     }
 
     initVarPorts()
@@ -8748,7 +8605,11 @@ class Op extends Events
      */
     refreshParams()
     {
+
+        /* minimalcore:start */
         if (this.patch && this.patch.isEditorMode() && this.isCurrentUiOp()) Patch.getGui().opParams.show(this);
+
+        /* minimalcore:end */
     }
 
     /**
@@ -8757,7 +8618,11 @@ class Op extends Events
      */
     isCurrentUiOp()
     {
+
+        /* minimalcore:start */
         if (this.patch.isEditorMode()) return Patch.getGui().patchView.isCurrentOp(this);
+
+        /* minimalcore:end */
     }
 
     /**
@@ -8766,11 +8631,27 @@ class Op extends Events
      */
     checkGraphicsApi(api = 1)
     {
+
+        /* minimalcore:start */
         if (this.patch.isEditorMode())
             if (this.patch.cg && this.patch.cg.gApi != api)
                 this.setUiError("wronggapi", "Wrong graphics API", 2);
 
+        /* minimalcore:end */
+
     }
+
+    /**
+     * @param {Op} op
+     * @param {string} name
+     * @param {number} type
+     * @param {import("./core_port.js").PortUiAttribs} [uiAttribs]
+     */
+    newPort(op, name, type, uiAttribs)
+    {
+        return new CABLES.Port(op, name, type, uiAttribs);
+    }
+
 }
 
 ;// CONCATENATED MODULE: ./src/core/embedding.js
@@ -8778,6 +8659,8 @@ class Op extends Events
 
 
 const EMBED = {};
+
+/* minimalcore:start */
 
 /**
  * add patch into html element (will create canvas and set size to fill containerElement)
@@ -8797,7 +8680,7 @@ EMBED.addPatch = function (_element, options)
 
         if (!el)
         {
-            console.error(id + " Polyshape Container Element not found!");
+            console.error(id + " Container Element not found!"); // eslint-disable-line
             return;
         }
     }
@@ -8811,8 +8694,8 @@ EMBED.addPatch = function (_element, options)
         "resize",
         function ()
         {
-            this.setAttribute("width", el.clientWidth);
             this.height = el.clientHeight;
+            this.width = el.clientWidth;
         }.bind(canvEl),
     );
 
@@ -8825,7 +8708,7 @@ EMBED.addPatch = function (_element, options)
     {
         options.onError = function (err)
         {
-            console.error(err);
+            console.error(err);// eslint-disable-line
         };
     }
 
@@ -8835,9 +8718,156 @@ EMBED.addPatch = function (_element, options)
 
 
 
+/* minimalcore:end */
+
+;// CONCATENATED MODULE: ./src/core/core_profiler.js
+
+
+
+/**
+ * @typedef ProfilerItem
+ * @property  {String} [title] overwrite title of port (by default this is portname)
+ * @property numTriggers {number}
+ * @property timeUsed {number}
+ * @property timeUsedFrame {number}
+ * @property opid {string}
+ * @property subPatch {string}
+
+ * @property timePsMsAvg {number}
+ * @property timePsMs {number}
+ * @property timePsCount {number}
+ * @property _timePsCount {number}
+ * @property _timePsStart {number}
+ * @property _timePsMs {number}
+ */
+
+class Profiler
+{
+
+    /* minimalcore:start */
+    /**
+     * @param {Patch} patch
+     */
+    constructor(patch)
+    {
+        this.startFrame = patch.getFrameNum();
+
+        /** @type {Object.<string, ProfilerItem>} */
+        this.items = {};
+        this.currentId = null;
+        this.currentStart = 0;
+        this._patch = patch;
+    }
+
+    getItems()
+    {
+        return this.items;
+    }
+
+    clear()
+    {
+        this.currentStart = performance.now();
+        if (this.paused) return;
+        this.items = {};
+    }
+
+    togglePause()
+    {
+        this.paused = !this.paused;
+        if (!this.paused)
+        {
+            this.items = {};
+            this.currentStart = performance.now();
+        }
+    }
+
+    /**
+     * @param {any} type
+     * @param {Object} object
+     */
+    add(type, object)
+    {
+        if (this.paused) return;
+
+        if (this.currentId !== null)
+        {
+            if (!object || object.id != this.currentId)
+            {
+                const item = this.items[this.currentId];
+                if (item)
+                {
+                    item.timeUsed += performance.now() - this.currentStart;
+                    item._timePsCount++;
+                    item._timePsMs += performance.now() - this.currentStart;
+
+                    if (item._timePsStart == 0 || performance.now() > item._timePsStart + 1000)
+                    {
+                        item.timePsMs = item._timePsMs;
+                        item.timePsMsAvg = item._timePsMs / item._timePsCount;
+                        item.timePsCount = item._timePsCount;
+                        item._timePsCount = 0;
+                        item._timePsMs = 0;
+                        item._timePsStart = performance.now();
+                    }
+
+                    if (!item.peakTime || now() - item.peakTime > 5000)
+                    {
+                        item.peak = 0;
+                        item.peakTime = now();
+                    }
+                    item.peak = Math.max(item.peak, performance.now() - this.currentStart);
+                }
+            }
+        }
+
+        if (object !== null)
+        {
+            if (!this.items[object.id])
+            {
+                this.items[object.id] = {
+                    "numTriggers": 0,
+                    "timeUsed": 0,
+                    "timeUsedFrame": 0,
+                    "timePsMsAvg": 0,
+                    "timePsMs": 0,
+                    "_timePsCount": 0,
+                    "_timePsMs": 0,
+                    "_timePsStart": performance.now()
+                };
+            }
+
+            if (this.items[object.id].lastFrame != this._patch.getFrameNum()) this.items[object.id].numTriggers = 0;
+
+            this.items[object.id].lastFrame = this._patch.getFrameNum();
+            this.items[object.id].numTriggers++;
+            this.items[object.id].opid = object.op.id;
+            this.items[object.id].title = object.op.name + "." + object.name;
+            this.items[object.id].subPatch = object.op.uiAttribs.subPatch;
+
+            this.currentId = object.id;
+            this.currentStart = performance.now();
+        }
+        else
+        {
+            this.currentId = null;
+        }
+    }
+
+    print()
+    {
+        for (const i in this.items)
+        {
+            console.log(this.items[i].title + ": " + this.items[i].numTriggers + " / " + this.items[i].timeUsed); // eslint-disable-line
+        }
+    }
+
+    /* minimalcore:end */
+}
+
 ;// CONCATENATED MODULE: ./src/core/sessionvar.js
 // todo: old... remove this from ops...
 
+/* minimalcore:start */
 /**
  * todo: old... remove this from ops...
  *
@@ -8875,6 +8905,8 @@ const Variable = function ()
 
 
 
+/* minimalcore:end */
+
 ;// CONCATENATED MODULE: ./src/core/renderloop.js
 
 
@@ -8894,7 +8926,44 @@ class RenderLoop extends Events
 
 }
 
+;// CONCATENATED MODULE: ./src/core/stack.js
+class Stack
+{
+    #arr = [];
+
+    /**
+     * @param {any} a
+     */
+    push(a)
+    {
+        this.#arr.push(a);
+    }
+
+    pop()
+    {
+        return this.#arr.pop();
+    }
+
+    clear()
+    {
+        this.#arr.length = 0;
+        return this;
+    }
+
+    current()
+    {
+        return this.#arr[this.#arr.length - 1];
+    }
+
+    array()
+    {
+        return this.#arr;
+    }
+
+}
+
 ;// CONCATENATED MODULE: ./src/core/index.js
+
 
 
 
@@ -8929,7 +8998,6 @@ CABLES.Op = Op;
 CABLES.Profiler = Profiler;
 CABLES.Patch = Patch;
 CABLES.Timer = Timer;
-CABLES.Variable = Variable;
 CABLES.LoadingStatus = LoadingStatus;
 CABLES.now = now;
 CABLES.internalNow = internalNow;
@@ -8943,21 +9011,27 @@ CABLES.getShortOpName = getShortOpName;
 CABLES.simpleId = simpleId;
 CABLES.clamp = clamp;
 CABLES.map = map;
-CABLES.shuffleArray = shuffleArray;
 CABLES.generateUUID = generateUUID;
 CABLES.prefixedHash = prefixedHash;
 CABLES.smoothStep = smoothStep;
 CABLES.smootherStep = smootherStep;
-CABLES.cacheBust = cacheBust;
 CABLES.copyArray = copyArray;
 CABLES.basename = basename;
 CABLES.logStack = logStack;
 CABLES.filename = filename;
+
+/* minimalcore:start */
 CABLES.ajax = ajax;
-// CABLES.request = utils.request;
+CABLES.cacheBust = cacheBust;
+CABLES.shuffleArray = shuffleArray;
+CABLES.Variable = Variable;
+
+/* minimalcore:end */
+
 CABLES.logErrorConsole = logErrorConsole;
 CABLES.isNumeric = isNumeric;
 CABLES.uniqueArray = uniqueArray;
+CABLES.Stack = Stack;
 
 /** @type {Array<Op>} */
 CABLES.OPS = [];
@@ -8982,4 +9056,4 @@ if(__webpack_exports__.__esModule) Object.defineProperty(__webpack_export_target
 ;
 
 
-var CABLES = CABLES || {}; CABLES.build = {"timestamp":1765798057808,"created":"2025-12-15T11:27:37.808Z","git":{"branch":"master","commit":"fe270a6f7315520b8c44a43c30b5e4e61178aad0","date":"1765794268","message":"dev changes and midi fix"}};
+var CABLES = CABLES || {}; CABLES.build = {"timestamp":1771846013530,"created":"2026-02-23T11:26:53.530Z","git":{"branch":"develop","commit":"cddb046af733593339fbdeb5544acb52c61b465c","date":"1771845227","message":"stuff"}};
